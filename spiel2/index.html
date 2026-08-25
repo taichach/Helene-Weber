@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IN DUNKLEN ZEITEN ENTSCHEIDUNGEN TREFFEN</title>
+    <style>
+        /* --- CSS Bereich (Styling) --- */
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f7f3e8; /* Helle Sepia-Töne */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fffaf0; /* Weißer, leicht vergilbter Hintergrund */
+            padding: 30px;
+            border: 5px solid #6b584e;
+            box-shadow: 10px 10px 0 #9c8477;
+        }
+
+        h1 {
+            font-family: 'Times New Roman', serif;
+            font-size: 2.5em;
+            color: #4b0000; /* Dunkelrot */
+            border-bottom: 2px solid #a0522d;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #4b0000;
+            margin-top: 10px; 
+            font-size: 1.8em;
+        }
+
+        .scenario {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            margin: 30px 0;
+            border: 1px solid #ccc;
+            padding: 15px;
+            background-color: #fcf8f0;
+            text-align: left;
+        }
+
+        .scenario-text {
+            flex: 3;
+            padding-right: 20px;
+            font-size: 1.1em;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .scenario-image-placeholder {
+            flex: 2;
+            min-width: 200px;
+            height: 200px;
+            background-color: #e0e0e0;
+            border: 2px solid #6b584e;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            font-style: italic;
+            color: #6b584e;
+            overflow: hidden;
+            padding: 5px;
+            position: relative;
+        }
+        
+        /* Zoom Button Styling */
+        .zoom-button {
+            position: absolute;
+            top: 10px; 
+            right: 10px;
+            background: #4b0000; 
+            color: #fffaf0; 
+            border: 2px solid #fffaf0; 
+            padding: 8px 12px; 
+            cursor: pointer;
+            font-size: 1.2em; 
+            line-height: 1;
+            z-index: 10;
+            border-radius: 50%; 
+            opacity: 0.9;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
+        }
+
+        .zoom-button:hover {
+            opacity: 1;
+            transform: scale(1.05); 
+        }
+        
+        /* Neuer Media/Comic Button Stil unter dem Text */
+        #video-info-area {
+            display: flex;
+            flex-wrap: wrap; /* Erlaubt das Umbrechen von Buttons */
+            justify-content: center;
+            gap: 15px; /* Abstand zwischen den Buttons */
+            margin: 15px 0 25px 0;
+            padding: 10px;
+            border-top: 1px dashed #a0522d;
+            border-bottom: 1px dashed #a0522d;
+        }
+
+        .video-info-button {
+            background-color: #6b584e; /* Erdbraun */
+            color: #fffaf0;
+            border: 2px solid #4b0000;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .video-info-button:hover {
+            background-color: #4b0000; /* Dunkelrot */
+        }
+        
+        /* Modal Styling (Popup) für Bild */
+        #modal-image-viewer {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding-top: 60px;
+        }
+
+        #modal-image-viewer .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 800px;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        
+        /* Modal Styling (Popup) für Info, Comic und Audio */
+        #modal-info-viewer, #modal-comic-viewer, #modal-audio-viewer {
+            display: none; /* WICHTIG: Startet immer versteckt */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding-top: 0; 
+        }
+        
+        /* Zentrierung, falls Modal per JS auf display:flex gesetzt wird */
+        #modal-comic-viewer {
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Info-Modal ist nicht zentriert */
+        #modal-info-viewer, #modal-audio-viewer {
+            align-items: flex-start;
+            padding-top: 60px;
+        }
+
+
+        #modal-info-viewer .modal-content, #modal-audio-viewer .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            background-color: #fffaf0;
+            padding: 30px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        
+        #modal-info-viewer .modal-content h3, #modal-audio-viewer .modal-content h3 {
+            color: #4b0000;
+            border-bottom: 2px solid #a0522d;
+            padding-bottom: 10px;
+        }
+        
+        /* Spezielles Styling für den Audio-Player im Modal */
+        #audio-player {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        /* Comic Slider Styling */
+        #modal-comic-viewer .modal-content {
+            position: relative;
+            max-width: 800px;
+            max-height: 90vh;
+            background-color: #fffaf0;
+            padding: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            margin: 20px; /* Sicherstellen, dass der Slider nicht an den Rand stößt */
+        }
+
+        #comic-slider-container {
+            position: relative;
+            text-align: center;
+        }
+
+        #comic-image {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            max-height: 75vh;
+            object-fit: contain;
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+            z-index: 10;
+            opacity: 0.8;
+            border-radius: 3px;
+        }
+
+        .slider-button:hover {
+            opacity: 1;
+        }
+
+        #prev-comic-btn {
+            left: 10px;
+        }
+
+        #next-comic-btn {
+            right: 10px;
+        }
+
+        #comic-caption {
+            color: #333;
+            font-size: 1em;
+            padding: 10px 0 5px 0;
+            text-align: center;
+        }
+        /* Ende Comic Slider Styling */
+
+
+        #modal-image-viewer .close,
+        #modal-info-viewer .close,
+        #modal-comic-viewer .close,
+        #modal-audio-viewer .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        
+        #modal-info-viewer .close,
+        #modal-comic-viewer .close,
+        #modal-audio-viewer .close {
+            color: #f1f1f1;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+
+        #modal-image-viewer .close:hover,
+        #modal-image-viewer .close:focus,
+        #modal-info-viewer .close:hover,
+        #modal-info-viewer .close:focus,
+        #modal-comic-viewer .close:hover,
+        #modal-comic-viewer .close:focus,
+        #modal-audio-viewer .close:hover,
+        #modal-audio-viewer .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Ende Modal Styling */
+
+        .image-caption {
+            font-size: 0.75em;
+            color: #6b584e;
+            text-align: left;
+            margin-top: 5px;
+            padding: 0 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .scenario-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center; 
+            margin-top: 20px;
+        }
+
+        .option-button {
+            flex: 0 1 auto; 
+            padding: 15px;
+            margin: 0 10px;
+            cursor: pointer;
+            border: 3px solid #6b584e;
+            background-color: #eee8d5;
+            color: #333;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            text-align: center;
+            min-width: 200px; 
+        }
+
+        .option-button:hover {
+            background-color: #e0d8c7;
+            border-color: #4b0000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        #game-chronik {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px dashed #4b0000;
+            text-align: left;
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        #game-chronik .option-button {
+            flex: 0;
+            min-width: 250px;
+        }
+        
+        #chronik-liste {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        
+        #chronik-liste li {
+            margin-bottom: 10px;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 5px;
+        }
+
+        #final-summary-layout {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        #chronik-section {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #fcf8f0;
+        }
+        
+        #helene-weber-text {
+            flex: 1;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        
+        #helene-weber-text h3 {
+            color: #4b0000;
+            margin-top: 0;
+            border-bottom: 1px solid #4b0000;
+            padding-bottom: 5px;
+        }
+        
+        /* Stil für den anklickbaren Text-Link im Szenario */
+        .info-link {
+            font-weight: bold;
+            color: #4b0000;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* --- STYLING FÜR DEN BILDSCHIRMSCHONER (Vollbild) --- */
+        #screensaver {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            cursor: pointer;
+            color: #fff;
+            padding: 0; 
+            box-sizing: border-box;
+            
+            background-image: url('startbildschirm.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            text-align: center;
+        }
+
+        #screensaver-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; 
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); 
+            padding-bottom: 50px; 
+            max-width: 100%; 
+            max-height: 100%;
+        }
+
+        #screensaver-content img {
+            display: none !important; 
+        }
+
+        #screensaver-text {
+            margin-top: 0; 
+            font-size: 2.5em; 
+            color: yellow;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000; 
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="screensaver" onclick="startGame()">
+        <div id="screensaver-content">
+            <img src="startbildschirm.jpg" alt="Bildschirmschoner: Startbild" style="display: none;">
+            <div id="screensaver-text">Tippe auf den Bildschirm, um das Spiel zu starten.</div>
+        </div>
+    </div>
+    <div class="container" id="game-container" style="display: none;">
+        <h1>ENTSCHEIDUNGEN IN DUNKLER ZEIT - WIE ENTSCHEIDEST DU DICH?</h1>
+        <hr>
+        
+        <div id="game-content">
+            </div>
+
+        <div id="game-chronik" class="hidden">
+            <h2>Spielende: Deine Bilanz</h2>
+            
+            <div id="final-summary-layout">
+                <div id="chronik-section">
+                    <h3>📜 Deine Spielchronik: Getroffene Entscheidungen</h3>
+                    <ul id="chronik-liste">
+                        </ul>
+                </div>
+                
+                <div id="helene-weber-text">
+                    <h3>Der Alltag Helene Webers im Nationalsozialismus</h3>
+                    <p>
+                        Nach 1933 durfte Helene Weber keine öffentlichen Ämter mehr ausüben. Dennoch zog sie sich
+                        nicht vollständig zurück, sondern engagierte sich weiter im katholischen Fürsorgerinnenverein.
+                        Trotz wachsender Überwachung blieb sie ihren Überzeugungen treu und lehnte das NS-Regime
+                        klar ab. Ihr Verhalten wurde zu einem Beispiel für stillen, aber entschlossenen Widerstand.
+                        In einer Zeit der Angst und Unterdrückung hielt sie an demokratischen Werten fest und
+                        unterstützte Menschen, wo sie konnte – oft im Verborgenen und unter großer persönlicher Gefahr.
+                    </p>
+                </div>
+            </div>
+            
+            <div id="button-container">
+                <button class="option-button" onclick="resetGame()">Neues Spiel starten</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-image-viewer" onclick="closeModal('image')">
+        <span class="close" onclick="closeModal('image')">&times;</span>
+        <img class="modal-content" id="modal-image">
+    </div>
+    
+    <div id="modal-info-viewer" onclick="closeModal('info')">
+        <span class="close" onclick="closeModal('info')">&times;</span>
+        <div class="modal-content" id="modal-info-content">
+            </div>
+    </div>
+
+    <div id="modal-comic-viewer" style="display: none;" onclick="closeModal('comic')">
+        <span class="close" onclick="closeModal('comic')">&times;</span>
+        <div class="modal-content" onclick="event.stopPropagation();">
+            <div id="comic-slider-container">
+                <img id="comic-image" src="" alt="Erklär-Comic Bild">
+                <button id="prev-comic-btn" class="slider-button" onclick="navigateComic(-1)">&#10094;</button>
+                <button id="next-comic-btn" class="slider-button" onclick="navigateComic(1)">&#10095;</button>
+                <div id="comic-caption"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-audio-viewer" onclick="closeModal('audio')">
+        <span class="close" onclick="closeModal('audio')">&times;</span>
+        <div class="modal-content" onclick="event.stopPropagation();">
+            <h3>🎙️ Rede Otto Wels zum Ermächtigungsgesetz</h3>
+            <p>
+                Ausschnitt aus der berühmten Rede des SPD-Vorsitzenden Otto Wels gegen das Ermächtigungsgesetz 
+                vom 23. März 1933 vor dem Reichstag. Wels betonte in seiner Rede die Unbeugsamkeit der Sozialdemokraten.
+            </p>
+            <audio id="audio-player" controls>
+                <source src="ermaechtigungsgesetz.mp3" type="audio/mpeg">
+                Ihr Browser unterstützt das Audio-Element nicht.
+            </audio>
+        </div>
+    </div>
+    
+    <script>
+        /* --- JavaScript Bereich (Spiellogik, Modal und Screensaver) --- */
+        
+        // Konstante für den BBG-Text (ohne **)
+        const INFO_BBG_CONTENT = `
+            <h3>Gesetz zur Wiederherstellung des Berufsbeamtentums (BBG)</h3>
+            <p>
+                Am 7. April 1933, wenige Monate nach Hitlers Ernennung zum Reichskanzler, erließ die NS-Regierung eines ihrer ersten Gesetze: das Gesetz zur Wiederherstellung des Berufsbeamtentums. Ziel war es, politische Gegner und jüdische Beamt*innen aus dem Staatsdienst zu entfernen und einen NS-treuen, „arischen“ Beamtenapparat aufzubauen. Dadurch wurden Verwaltung, Bildung und Justiz gleichgeschaltet.
+            </p>
+            <p>
+                In § 3, dem sogenannten Arierparagraphen, wurde festgelegt, dass „nicht-arische“ Beamte entlassen werden mussten – mit wenigen Ausnahmen, etwa für jüdische Frontkämpfer des Ersten Weltkriegs. Zudem wurde der sogenannte Ariernachweis eingeführt. § 4 erlaubte die Entlassung von Beamt*innen, die als politisch „unzuverlässig“ galten, etwa Mitglieder der SPD oder KPD.
+            </p>
+            <p>
+                Das Gesetz führte zur Entlassung von Lehrerinnen, Richterinnen und Ärzt*innen und bereitete den Boden für weitere NS-Rassengesetze. Es war ein entscheidender Schritt zur Festigung der NS-Diktatur und zur politischen und rassistischen Ausgrenzung.
+            </p>
+            <p>
+                Bis heute erinnert es daran, wie Gesetze zur Zerstörung demokratischer Strukturen missbraucht werden können.
+            </p>
+        `;
+        
+        // Konstante für den KDFB-Text (ohne **)
+        const INFO_KDFB_CONTENT = `
+            <h3>Der Katholische Deutsche Frauenbund (KDFB)</h3>
+            <p>
+                Der Katholische Deutsche Frauenbund (KDFB) wurde am 16. November 1903 in Köln von katholischen Frauen gegründet, die aus der bürgerlichen Frauenbewegung stammten. Ziel war ein von Frauen geleiteter Verband, der sich auf Basis christlicher Werte für die Gleichberechtigung und bessere Lebensbedingungen von Frauen einsetzte. Dieses Anliegen ist bis heute aktuell.
+            </p>
+            <p>
+                Schwerpunkte waren und sind: Bildung, Gleichstellung, soziale Gerechtigkeit sowie die Förderung politischer Teilhabe. Nach Einführung des Frauenwahlrechts 1918 engagierten sich viele KDFB-Mitglieder politisch, einige zogen in Parlamente ein. Darunter bekannte Namen wie Hedwig Dransfeld, Helene Weber und Christine Teusch.
+            </p>
+            <p>
+                Der KDFB versteht sich als sozial-caritativer und kirchlich engagierter Frauenverband. Spirituelle Angebote und der Einsatz für Frieden gehören ebenso dazu. Ein Beispiel dafür ist die von Hedwig Dransfeld mit gegründete Frauenfriedenskirche in Frankfurt, zu der der KDFB bis heute Wallfahrten unternimmt. Seit über 120 Jahren wirkt der KDFB in Kirche, Gesellschaft und Politik, für Gerechtigkeit, Teilhabe und Frieden.
+            </p>
+        `;
+        
+        const scenarios = [
+            // STARTBILDSCHIRM-SZENARIO
+            {
+                year: 1930,
+                // Einfacherer Titel für den Startbildschirm
+                title: "Tritt ein in die Geschichte",
+                text: "Tritt eine Reise durch entscheidende Momente der deutschen Geschichte an. Deine Entscheidungen als bedeutende katholische Politikerin, Helene Weber, bestimmen dein Schicksal und das deiner Mitmenschen in der Zeit des Nationalsozialismus.", 
+                imageSrc: "helene_weber.jpg", 
+                imageCaption: "Helene Weber, wahrscheinlich um 1925 (KDF, K-D1/00002)", 
+                options: [
+                    { id: 'S', text: "Spiel starten", danger: false }
+                ]
+            },
+            // SZENARIO 1 (Index 1) - Audio und Comic
+            {
+                year: 1933,
+                // Szenario-Überschrift entfernt
+                title: "", 
+                text: `Du bist eine prominente Abgeordnete des Zentrums und Staatsrätin. Nach der Machtübernahme der Nationalsozialisten wird das 
+                        <span class="info-link" onclick="showInfoBBG()">Gesetz zur Wiederherstellung des Berufsbeamtentums (BBG)</span> 
+                        erlassen. Auch du, als politische Akteurin der Weimarer Republik, wirst aufgrund dieses Gesetzes aus dem preußischen Staatsdienst entlassen. Deine Arbeit in der Öffentlichkeit endet abrupt.`,
+                imageSrc: "1933.jpg",
+                imageCaption: "Adolf Hitlers Rede zum Ermächtigungsgesetz, 1933 (picture alliance / SZ Photo / Scherl)",
+                comicAvailable: true, // Comic verfügbar
+                audioAvailable: true, // Audio verfügbar
+                options: [
+                    { id: 'A', text: "Option A: Öffentlich protestieren und Kontakte mobilisieren. (Hilfsbereit/Widerstand, hohe persönliche Gefahr)", danger: true },
+                    { id: 'B', text: "Option B: Im Hintergrund bleiben und Kontakte für spätere, leise Hilfe pflegen. (Vorsichtig/Strategisch, Sicherheit)", danger: false }
+                ]
+            },
+            // SZENARIO 2 (Index 2) - KDFB Text angepasst
+            {
+                year: 1935,
+                // Szenario-Überschrift entfernt
+                title: "",
+                text: `Du bist weiterhin im <span class="info-link" onclick="showInfoKDFB()">Katholischen Deutschen Frauenbund (KDFB)</span> aktiv, der eine wichtige geistige Zuflucht bietet. Viele Frauen berichten dir von Verfolgung, Bedrohung und Willkür durch das Regime. Jede Tätigkeit wird riskanter, doch dein Netzwerk bittet dich weiterhin um konkrete Unterstützung und Fürsorge für Hilfsbedürftige.`,
+                imageSrc: "1935.jpg",
+                imageCaption: "Der katholische deutsche Frauenbund (KDF) hat auch weibliche Mitglieder der Nationalversammlung in ihren Reihen wie z.B. Hedwig Dransfeld (3.v.l.) oder Helene Weber (1.v.r.) (KDF, K-F1/00093)",
+                options: [
+                    { id: 'A', text: "Option A: Trotz der Gefahr konkret helfen und materielle Unterstützung organisieren. (Hilfsbereit/Solidarität, Risiko von Verhören)", danger: true },
+                    { id: 'B', text: "Option B: Zum Schutz deiner Person und deiner Netzwerke deine Tätigkeiten auf das Minimum reduzieren. (Vorsichtig, Sicherheit der Gruppe)", danger: false }
+                ]
+            },
+            {
+                year: 1942,
+                // Szenario-Überschrift entfernt
+                title: "",
+                text: "Kritik am Regime ist nun lebensgefährlich. Du veröffentlichst nicht mehr, doch im Verborgenen hilfst du weiterhin Menschen, die verfolgt werden – im Wissen, dass jede Geste entdeckt werden könnte und zur Gestapo führen kann. Du erhältst eine dringende Hilfsanfrage für eine dir bekannte Person.",
+                imageSrc: "1942.jpg",
+                imageCaption: "Das Publizieren wurde für Helene Weber immer gefährlicher, weshalb sie erst nach dem Zweiten Weltkrieg wieder in die Öffentlichkeit trat (KDF, K-F1/00118)",
+                options: [
+                    { id: 'A', text: "Option A: Sofort auf die Hilfsanfrage reagieren und das Risiko eingehen, beobachtet zu werden. (Hilfsbereit, akute Gefahr)", danger: true },
+                    { id: 'B', text: "Option B: Aus Angst um deine eigene Sicherheit die Anfrage ablehnen und dich zurückziehen. (Vorsichtig, Gewissenskonflikt)", danger: false }
+                ]
+            },
+            {
+                year: 1944,
+                // Szenario-Überschrift entfernt
+                title: "",
+                text: "20. Juli 1944: Das Attentat auf Hitler scheitert. Das Regime reagiert mit brutaler Härte und Massenverhaftungen. Auch du stehst als ehemalige Zentrumspolitikerin unter verschärftem Verdacht, Kontakte zu Widerstandskreisen zu pflegen. Freunde raten dir dringend, belastende Unterlagen sofort zu vernichten.",
+                imageSrc: "1944.jpg",
+                imageCaption: "Inneres der zerstörten „Lagebesprechungsbaracke“, auch bekannt als Führerhauptquartier „Wolfsschanze“ nach der Explosion, Rastenburg im Juli 1944 (BArch, Bild 146-1972-025-12 / o. Ang.)",
+                options: [
+                    { id: 'A', text: "Option A: Dokumente behalten und weiterhin helfen, da sie für die Arbeit nach dem Krieg wichtig sein könnten. (Aktiver Widerstand, Todesgefahr)", danger: true },
+                    { id: 'B', text: "Option B: Alle verdächtigen Unterlagen vernichten, um die eigene Verhaftung zu verhindern. (Vermeidung von Gefahr, Passivität)", danger: false }
+                ]
+            }
+        ];
+
+        let currentScenarioIndex = 0;
+        let chronik = [];
+        const gameContainer = document.getElementById('game-container'); 
+        const gameContent = document.getElementById('game-content');
+        const gameChronik = document.getElementById('game-chronik');
+        const chronikListe = document.getElementById('chronik-liste');
+        
+        // Modal-Elemente
+        const modalImage = document.getElementById('modal-image-viewer');
+        const modalImg = document.getElementById('modal-image');
+        const modalInfo = document.getElementById('modal-info-viewer');
+        const modalInfoContent = document.getElementById('modal-info-content');
+        const modalAudio = document.getElementById('modal-audio-viewer'); // NEU
+        const audioPlayer = document.getElementById('audio-player'); // NEU
+        
+        // Comic-Elemente
+        const modalComic = document.getElementById('modal-comic-viewer');
+        const comicImage = document.getElementById('comic-image');
+        const comicCaption = document.getElementById('comic-caption');
+        let currentComicIndex = 1;
+        const MAX_COMIC_IMAGES = 5;
+        const COMIC_BASE_PATH = 'comic/Bild'; 
+        
+        
+        // Screensaver-Elemente und Timer
+        const screensaver = document.getElementById('screensaver');
+        const INACTIVITY_TIMEOUT = 180000; // 3 Minuten in Millisekunden
+        let inactivityTimer;
+
+        function resetTimer() {
+            clearTimeout(inactivityTimer);
+            if (screensaver.style.display !== 'flex') {
+                inactivityTimer = setTimeout(showScreensaver, INACTIVITY_TIMEOUT);
+            }
+        }
+        
+        function startGame() {
+            screensaver.style.display = 'none';
+            gameContainer.style.display = 'block';
+            renderScenario();
+            resetTimer(); 
+        }
+        
+        function resetGame() {
+            currentScenarioIndex = 0; 
+            chronik = []; 
+            gameChronik.classList.add('hidden'); 
+            gameContent.classList.remove('hidden'); 
+            
+            startGame(); 
+        }
+
+        function showScreensaver() {
+            // Alle offenen Modals schließen und Audio stoppen, dann neu laden
+            closeModal('image');
+            closeModal('info');
+            closeModal('comic');
+            closeModal('audio');
+            window.location.reload(); 
+        }
+
+        // Event-Listener, um den Timer bei Aktivität zurückzusetzen
+        document.addEventListener('mousemove', resetTimer);
+        document.addEventListener('keydown', resetTimer);
+        document.addEventListener('click', resetTimer);
+        document.addEventListener('touchstart', resetTimer);
+        
+        // Funktionen für Modal
+        function openModal(imageSrc) {
+            modalImage.style.display = "block";
+            modalImg.src = imageSrc;
+            clearTimeout(inactivityTimer); 
+        }
+        
+        function showInfoBBG() {
+            modalInfoContent.innerHTML = INFO_BBG_CONTENT;
+            modalInfo.style.display = "block";
+            clearTimeout(inactivityTimer); 
+        }
+        
+        function showInfoKDFB() {
+            modalInfoContent.innerHTML = INFO_KDFB_CONTENT;
+            modalInfo.style.display = "block";
+            clearTimeout(inactivityTimer); 
+        }
+        
+        // NEUE FUNKTION: Audio-Popup zeigen und abspielen
+        function showAudioPopup() {
+            modalAudio.style.display = "block";
+            // Das Audio-Element im Modal ansprechen und abspielen
+            // Wir verwenden .play(), um die Wiedergabe zu starten
+            audioPlayer.play().catch(error => {
+                // Fehlerbehandlung, falls Autoplay blockiert wird
+                console.log("Audio-Wiedergabe konnte nicht automatisch gestartet werden (vom Browser blockiert).", error);
+            });
+            clearTimeout(inactivityTimer); 
+        }
+
+        // Comic Funktionen
+        function showComic() {
+            currentComicIndex = 1; // Immer mit dem ersten Bild starten
+            renderComic();
+            // WICHTIG: Display explizit auf 'flex' setzen
+            modalComic.style.display = "flex";
+            clearTimeout(inactivityTimer); 
+        }
+
+        function navigateComic(direction) {
+            currentComicIndex += direction;
+            
+            if (currentComicIndex < 1) {
+                currentComicIndex = 1; // Nicht unter 1
+            } else if (currentComicIndex > MAX_COMIC_IMAGES) {
+                currentComicIndex = MAX_COMIC_IMAGES; // Nicht über Max
+            }
+            
+            renderComic();
+        }
+
+        function renderComic() {
+            comicImage.src = `${COMIC_BASE_PATH}${currentComicIndex}.jpg`;
+            comicCaption.textContent = `Bild ${currentComicIndex} von ${MAX_COMIC_IMAGES}`;
+            
+            // Buttons steuern
+            document.getElementById('prev-comic-btn').style.display = currentComicIndex > 1 ? 'block' : 'none';
+            document.getElementById('next-comic-btn').style.display = currentComicIndex < MAX_COMIC_IMAGES ? 'block' : 'none';
+        }
+
+
+        function closeModal(type) {
+            if (type === 'image') {
+                modalImage.style.display = "none";
+            } else if (type === 'info') {
+                modalInfo.style.display = "none";
+            } else if (type === 'comic') {
+                modalComic.style.display = "none";
+            } else if (type === 'audio') { // NEU
+                modalAudio.style.display = "none";
+                audioPlayer.pause(); // Wiedergabe stoppen, wenn Modal geschlossen wird
+                audioPlayer.currentTime = 0; // Auf Anfang zurücksetzen
+            }
+            resetTimer(); 
+        }
+
+        // Spiellogik
+        function renderScenario() {
+            if (currentScenarioIndex >= scenarios.length) {
+                showChronik();
+                return;
+            }
+
+            const scenario = scenarios[currentScenarioIndex];
+            
+            let headingText = '';
+            if (currentScenarioIndex === 0) {
+                // Bei Szenario 0 (Start) den Titel zeigen
+                headingText = `<h2>${scenario.title}</h2>`; 
+            } else {
+                // Bei nachfolgenden Szenarien (Index > 0) nur die Jahreszahl zeigen
+                headingText = `<h2>${scenario.year}</h2>`; 
+            }
+
+
+            const imageClickHandler = `openModal('${scenario.imageSrc}')`;
+            
+            let mediaInfoAreaHtml = '';
+            
+            // Logik für Comic- und NEU Audio-Button (nur in Szenario 1)
+            if (currentScenarioIndex === 1) {
+                let comicButton = '';
+                let audioButton = ''; // NEU
+                
+                if (scenario.comicAvailable) {
+                     comicButton = `
+                        <button class="video-info-button" onclick="showComic()">
+                            🖼️ Erklär-Comic zum Ermächtigungsgesetz
+                        </button>
+                    `;
+                }
+
+                if (scenario.audioAvailable) { // NEU: Bedingung für Audio
+                    audioButton = `
+                        <button class="video-info-button" onclick="showAudioPopup()">
+                            🎧 Rede Otto Wels zum Ermächtigungsgesetz
+                        </button>
+                    `;
+                }
+
+                // Fügt beide Buttons in die Media Info Area ein
+                if (comicButton || audioButton) {
+                    mediaInfoAreaHtml = `
+                        <div id="video-info-area">
+                            ${audioButton}
+                            ${comicButton}
+                        </div>
+                    `;
+                }
+            }
+
+
+            gameContent.innerHTML = `
+                ${headingText}
+                <div class="scenario">
+                    <div class="scenario-text">
+                        ${scenario.text}
+                    </div>
+                    <div class="scenario-image-placeholder">
+                        <img src="${scenario.imageSrc}" alt="Szenario Bild ${scenario.year}">
+                        <button class="zoom-button" onclick="${imageClickHandler}">🔍</button> 
+                        <div class="image-caption">${scenario.imageCaption}</div>
+                    </div>
+                </div>
+                ${mediaInfoAreaHtml}
+                <div class="options">
+                    ${scenario.options.map(opt => `
+                        <button class="option-button" onclick="makeDecision('${scenario.year}', '${scenario.title}', '${opt.id}', '${opt.text}')">
+                            ${opt.text}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function makeDecision(year, title, optionId, optionText) {
+            resetTimer(); 
+
+            if (currentScenarioIndex > 0) { 
+                chronik.push({ year: year, title: scenarios[currentScenarioIndex].title, decision: optionText });
+            }
+            currentScenarioIndex++;
+            renderScenario();
+        }
+
+        function showChronik() {
+            clearTimeout(inactivityTimer); 
+            gameContent.classList.add('hidden');
+            gameChronik.classList.remove('hidden');
+
+            chronikListe.innerHTML = chronik.map(item => `
+                <li><strong>${item.year} – ${item.title}:</strong> ${item.decision}</li>
+            `).join('');
+
+        }
+
+        // Starte das Spiel, wenn die Seite geladen ist (zeigt den Screensaver)
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     // Warte bis alle Ressourcen geladen sind, bevor der Screensaver angezeigt wird
+        //     // Lass ich jetzt weg, da der Screensaver per CSS/HTML schon initial da ist.
+        //     // Wenn du möchtest, dass das Spiel direkt startet: startGame();
+        // });
+    </script>
+</body>
+</html>
