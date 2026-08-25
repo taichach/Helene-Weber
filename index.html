@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meine Lernspiele</title>
+
+    <style>
+        /* =========================================
+           GRUNDEINSTELLUNGEN
+        ========================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --background: #f5f7fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(79, 70, 229, 0.12),
+                    transparent 35%
+                ),
+                var(--background);
+
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+
+        /* =========================================
+           HEADER / HERO
+        ========================================= */
+
+        header {
+            padding: 70px 20px 55px;
+            text-align: center;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 72px;
+            height: 72px;
+
+            border-radius: 20px;
+
+            background: linear-gradient(
+                135deg,
+                var(--primary),
+                var(--secondary)
+            );
+
+            color: white;
+            font-size: 34px;
+
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.3);
+
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+        }
+
+        header h1 span {
+            color: var(--primary);
+        }
+
+        header p {
+            max-width: 680px;
+            margin: 0 auto;
+
+            color: var(--muted);
+            font-size: 1.1rem;
+        }
+
+
+        /* =========================================
+           SPIELE-BEREICH
+        ========================================= */
+
+        main {
+            width: min(1200px, 92%);
+            margin: 0 auto 70px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .section-title h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .section-title p {
+            color: var(--muted);
+        }
+
+
+        /* =========================================
+           SPIEL-KARTEN
+        ========================================= */
+
+        .games-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 25px;
+        }
+
+        .game-card {
+            position: relative;
+
+            background: var(--card);
+
+            border: 1px solid var(--border);
+
+            border-radius: 22px;
+
+            padding: 30px;
+
+            box-shadow: var(--shadow);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 5px;
+
+            background: linear-gradient(
+                90deg,
+                var(--primary),
+                var(--secondary)
+            );
+        }
+
+        .game-card:hover {
+            transform: translateY(-7px);
+
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.13);
+        }
+
+
+        /* =========================================
+           SPIEL-NUMMER
+        ========================================= */
+
+        .game-number {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background: #eef2ff;
+
+            color: var(--primary);
+
+            font-size: 1.2rem;
+            font-weight: 800;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================================
+           SPIEL-TEXT
+        ========================================= */
+
+        .game-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 10px;
+        }
+
+        .game-card p {
+            color: var(--muted);
+            font-size: 0.95rem;
+
+            min-height: 75px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================================
+           BUTTON
+        ========================================= */
+
+        .play-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            width: 100%;
+
+            padding: 13px 18px;
+
+            border-radius: 12px;
+
+            background: var(--primary);
+            color: white;
+
+            text-decoration: none;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .play-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .play-button:active {
+            transform: scale(0.98);
+        }
+
+        .play-icon {
+            font-size: 1.1rem;
+        }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        footer {
+            text-align: center;
+
+            padding: 30px 20px;
+
+            border-top: 1px solid var(--border);
+
+            color: var(--muted);
+
+            font-size: 0.9rem;
+        }
+
+
+        /* =========================================
+           RESPONSIVE DESIGN
+        ========================================= */
+
+        @media (max-width: 600px) {
+
+            header {
+                padding-top: 45px;
+                padding-bottom: 40px;
+            }
+
+            .game-card {
+                padding: 25px;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+        }
+
+
+        /* =========================================
+           ANIMATION BEIM LADEN
+        ========================================= */
+
+        .game-card {
+            opacity: 0;
+            transform: translateY(20px);
+
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .game-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .game-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .game-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .game-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .game-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header>
+
+        <div class="logo">
+            🎓
+        </div>
+
+        <h1>
+            Meine <span>Lernspiele</span>
+        </h1>
+
+        <p>
+            Wähle eines der fünf Mini-Lernspiele aus und
+            starte direkt mit dem Lernen.
+        </p>
+
+    </header>
+
+
+    <!-- =========================================
+         HAUPTBEREICH
+    ========================================== -->
+
+    <main>
+
+        <div class="section-title">
+
+            <h2>
+                Lernspiele auswählen
+            </h2>
+
+            <p>
+                Klicke auf ein Spiel, um es zu starten.
+            </p>
+
+        </div>
+
+
+        <div class="games-grid">
+
+
+            <!-- =====================================
+                 SPIEL 1
+            ====================================== -->
+
+            <article class="game-card">
+
+                <div class="game-number">
+                    01
+                </div>
+
+                <h3>
+                    Lernspiel 1
+                </h3>
+
+                <p>
+                    Kurze Beschreibung deines ersten
+                    Lernspiels. Hier kannst du erklären,
+                    was die Lernenden erwartet.
+                </p>
+
+                <a
+                    class="play-button"
+                    href="spiel1/index.html"
+                >
+                    <span class="play-icon">▶</span>
+                    Spiel starten
+                </a>
+
+            </article>
+
+
+            <!-- =====================================
+                 SPIEL 2
+            ====================================== -->
+
+            <article class="game-card">
+
+                <div class="game-number">
+                    02
+                </div>
+
+                <h3>
+                    Lernspiel 2
+                </h3>
+
+                <p>
+                    Kurze Beschreibung deines zweiten
+                    Lernspiels und des Lernziels.
+                </p>
+
+                <a
+                    class="play-button"
+                    href="spiel2/index.html"
+                >
+                    <span class="play-icon">▶</span>
+                    Spiel starten
+                </a>
+
+            </article>
+
+
+            <!-- =====================================
+                 SPIEL 3
+            ====================================== -->
+
+            <article class="game-card">
+
+                <div class="game-number">
+                    03
+                </div>
+
+                <h3>
+                    Lernspiel 3
+                </h3>
+
+                <p>
+                    Kurze Beschreibung deines dritten
+                    Lernspiels.
+                </p>
+
+                <a
+                    class="play-button"
+                    href="spiel3/index.html"
+                >
+                    <span class="play-icon">▶</span>
+                    Spiel starten
+                </a>
+
+            </article>
+
+
+            <!-- =====================================
+                 SPIEL 4
+            ====================================== -->
+
+            <article class="game-card">
+
+                <div class="game-number">
+                    04
+                </div>
+
+                <h3>
+                    Lernspiel 4
+                </h3>
+
+                <p>
+                    Kurze Beschreibung deines vierten
+                    Lernspiels.
+                </p>
+
+                <a
+                    class="play-button"
+                    href="spiel4/index.html"
+                >
+                    <span class="play-icon">▶</span>
+                    Spiel starten
+                </a>
+
+            </article>
+
+
+            <!-- =====================================
+                 SPIEL 5
+            ====================================== -->
+
+            <article class="game-card">
+
+                <div class="game-number">
+                    05
+                </div>
+
+                <h3>
+                    Lernspiel 5
+                </h3>
+
+                <p>
+                    Kurze Beschreibung deines fünften
+                    Lernspiels.
+                </p>
+
+                <a
+                    class="play-button"
+                    href="spiel5/index.html"
+                >
+                    <span class="play-icon">▶</span>
+                    Spiel starten
+                </a>
+
+            </article>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer>
+
+        <p>
+            © 2026 – Meine Lernspiele
+        </p>
+
+    </footer>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script>
+
+        // ------------------------------------------------
+        // Kleine Begrüßung beim Laden der Seite
+        // ------------------------------------------------
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            console.log(
+                "Lernspiel-Übersicht erfolgreich geladen."
+            );
+
+        });
+
+
+        // ------------------------------------------------
+        // Verhindert einen Klick auf nicht vorhandene
+        // Links und zeigt eine verständliche Meldung.
+        // ------------------------------------------------
+
+        const buttons =
+            document.querySelectorAll(".play-button");
+
+        buttons.forEach(function (button) {
+
+            button.addEventListener("click", function (event) {
+
+                const target =
+                    button.getAttribute("href");
+
+                console.log(
+                    "Lernspiel wird geöffnet:",
+                    target
+                );
+
+            });
+
+        });
+
+    </script>
+
+</body>
+</html>
