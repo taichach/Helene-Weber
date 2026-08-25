@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entscheide Du: Gleichberechtigung?</title>
+    <style>
+        /* CSS-Teil */
+        :root {
+            --color-past: #004d40; /* Dunkles Petrol/Grün für Vergangenheit */
+            --color-present: #ff8f00; /* Orange/Gelb für Gegenwart */
+            --color-bg: #f5f5f5;
+            --color-text: #333;
+            --color-done: #e0e0e0; /* Hellgrau für erledigte Szenen */
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            scroll-behavior: smooth;
+        }
+
+        /* NEU: Startbildschirm-Stil (überdeckt alles) */
+        #startbildschirm {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            background-color: black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            /* GEÄNDERT: Text oben platzieren */
+            justify-content: flex-start; 
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            /* GEÄNDERT: Abstand vom oberen Rand (noch höher) */
+            padding-top: 2vh; 
+            
+            /* Hintergrundbild einbinden */
+            background-image: url('frauenbewegung.jpg'); /* Ersetzen Sie dies durch Ihren Bildpfad */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            /* Dimm-Effekt über das Bild */
+            transition: opacity 0.5s ease;
+            opacity: 1;
+        }
+        
+        /* NEU: Pulsierende Animation für den Text */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .screensaver-text {
+            position: relative;
+            z-index: 3001;
+            /* GEÄNDERT: Helleres Gelb */
+            color: #ffeb3b; 
+            font-size: 2.5em; 
+            font-weight: bold;
+            /* GEÄNDERT: Stärkerer schwarzer Schatten für Kontrast */
+            text-shadow: 0 0 15px rgba(0, 0, 0, 1); 
+            padding: 2px;
+            text-align: center;
+            /* Animation beibehalten */
+            animation: pulse 2s infinite alternate;
+        }
+
+        .scene {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            transition: height 0.5s ease-out, background-color 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 1;
+            min-height: 100vh;
+        }
+        
+        .scene.locked {
+            height: 0;
+            min-height: 0;
+            padding: 0 40px;
+            margin: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scene.completed {
+            background-color: var(--color-done);
+            min-height: 30vh;
+            pointer-events: auto;
+        }
+        .scene.completed:not(#abschlussszene) {
+            cursor: pointer;
+        }
+        .scene.completed:not(#abschlussszene) * {
+            pointer-events: none;
+        }
+        
+        .scene.completed h2 {
+            color: var(--color-past);
+            font-style: italic;
+        }
+
+        .scene h1, .scene h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .past-info-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 950px;
+            margin: 20px 0;
+        }
+        
+        .past-container {
+            display: flex;
+            justify-content: space-between;
+            width: 900px;
+            margin: 0;
+        }
+
+        .past-box {
+            width: 48%;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: var(--color-past);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .past-box h4 {
+            color: var(--color-present);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .info-button {
+            background: var(--color-present);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            transition: background 0.3s;
+        }
+
+        .info-button:hover {
+            background: #e67e22;
+        }
+
+        /* Modal / Popup Styling (Basis) */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        #finalAudioModal {
+            z-index: 3000; 
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            position: relative;
+            color: var(--color-text);
+            animation: slideIn 0.3s;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* Styling für Buttons in Modals */
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-buttons .accept {
+            background-color: var(--color-present);
+            color: white;
+        }
+        .modal-buttons .accept:hover {
+            background-color: #e67e22;
+        }
+        
+        .modal-buttons .deny {
+            background-color: var(--color-done);
+            color: var(--color-text);
+        }
+        .modal-buttons .deny:hover {
+            background-color: #ccc;
+        }
+        
+        /* Animationen */
+        @keyframes fadeIn {
+            from {opacity: 0}
+            to {opacity: 1}
+        }
+        @keyframes slideIn {
+            from {transform: translateY(-50px)}
+            to {transform: translateY(0)}
+        }
+
+
+        .present {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            color: var(--color-text);
+            border-left: 5px solid var(--color-present);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        }
+
+        .present.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        #abschlussszene {
+            background-color: var(--color-past);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .bewertung {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            border-top: 2px dashed #ccc;
+            width: 100%;
+            max-width: 900px;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .bewertung.visible {
+            opacity: 1;
+        }
+
+        .slider-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 30px auto 10px auto;
+        }
+
+        .percent-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--color-present);
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 15px;
+            background: linear-gradient(to right, red 0%, yellow 50%, green 100%);
+            border-radius: 5px;
+            outline: none;
+            transition: opacity .2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: white;
+            border: 3px solid var(--color-present);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            margin-top: 5px;
+            color: var(--color-text);
+        }
+        
+        .next-scene-button {
+            padding: 15px 30px;
+            margin-top: 30px;
+            background-color: var(--color-present);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .next-scene-button:hover:not(:disabled) {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .next-scene-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        #willkommen {
+            background-color: var(--color-past);
+            color: white;
+            text-align: center;
+            opacity: 0;
+            min-height: 0; 
+            height: 0; 
+            overflow: hidden; 
+        }
+
+        #willkommen.unlocked { 
+            opacity: 1;
+            min-height: 100vh;
+            height: auto;
+            pointer-events: auto;
+            padding: 40px;
+        }
+        
+        .next-scene-button-start {
+            background-color: white;
+            color: var(--color-past);
+        }
+        
+        #abschlussszene h2 {
+            color: var(--color-present);
+        }
+        
+        .summary-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+        }
+        
+        .summary-list li {
+            background-color: white;
+            color: var(--color-text);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-list li strong {
+            color: var(--color-past);
+        }
+        
+        .summary-percent {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--color-present);
+        }
+
+        .summary-average {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--color-present);
+            color: white;
+            border-radius: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body onmousemove="resetInactivityTimer()" onclick="resetInactivityTimer()" ontouchstart="resetInactivityTimer()">
+
+    <div id="startbildschirm" onclick="hideStartScreen()">
+        <p class="screensaver-text">Tippe auf dem Bildschirm, um das Spiel zu starten.</p>
+    </div>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3>Der Katholische Deutsche Frauenbund (KDFB)</h3>
+            <p>Der Katholische Deutsche Frauenbund (KDFB) wurde am 16. November 1903 in Köln von katholischen Frauen gegründet, die aus der bürgerlichen Frauenbewegung stammten. Ziel war ein von Frauen geleiteter Verband, der sich auf Basis christlicher Werte für die Gleichberechtigung und bessere Lebensbedingungen von Frauen einsetzte. Dieses Anliegen ist bis heute aktuell.</p>
+            <p>Schwerpunkte waren und sind: Bildung, Gleichstellung, soziale Gerechtigkeit sowie die Förderung politischer Teilhabe. Nach Einführung des Frauenwahlrechts 1918 engagierten sich viele KDFB-Mitglieder politisch, einige zogen in Parlamente ein. Darunter bekannte Namen wie Hedwig Dransfeld, Helene Weber und Christine Teusch.</p>
+            <p>Der KDFB versteht sich als sozial-caritativer und kirchlich engagierter Frauenverband. Spirituelle Angebote und der Einsatz für Frieden gehören ebenso dazu. Ein Beispiel dafür ist die von Hedwig Dransfeld mit gegründete Frauenfriedenskirche in Frankfurt, zu der der KDFB bis heute Wallfahrten unternimmt. Seit über 120 Jahren wirkt der KDFB in Kirche, Gesellschaft und Politik, für Gerechtigkeit, Teilhabe und Frieden.</p>
+        </div>
+    </div>
+    
+    <div id="finalAudioModal" class="modal">
+        <div class="modal-content">
+            <h3>Botschaft von Onyeka Oshionwu, Helene Weber Preisträgerin 2024</h3>
+            <p>Möchtest du die persönliche Einschätzung zur aktuellen Lage der Gleichberechtigung hören?</p>
+            
+            <div id="audioPlayerContainer" style="display: none; margin-top: 20px;">
+                <audio id="finalPreistraegerinAudio" src="gleichberechtigung.mp3" controls style="width: 100%;"></audio>
+                <p style="font-size: 0.8em; text-align: center; margin-top: 5px; color: #666;">Spiele das Statement mit dem Player ab.</p>
+            </div>
+            
+            <div class="modal-buttons" id="audioPromptButtons">
+                <button class="accept" onclick="handleFinalAudioChoice(true)">Ja, Statement hören</button>
+                <button class="deny" onclick="handleFinalAudioChoice(false)">Nein, fortfahren</button>
+            </div>
+            
+            <div class="modal-buttons" id="audioCloseButton" style="display: none;">
+                 <button class="next-scene-button" onclick="handleFinalAudioChoice(false)">Zur Auswertung zurückkehren</button>
+            </div>
+
+        </div>
+    </div>
+    <div id="willkommen" class="scene locked" data-scene-id="0">
+        <h1>Entscheide Du: Gleichberechtigung?</h1>
+        <h2>Von Helene Webers Vision zur Wirklichkeit</h2>
+        
+        <div style="max-width: 700px; text-align: left; margin-top: 20px; background-color: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px;">
+            <h3 style="color: var(--color-present); margin-top: 0;">Anleitung und Hintergrund</h3>
+            <p>Schüler*innen des Helene Weber Berufskollegs haben sich intensiv mit den ursprünglichen Forderungen und der politischen Vision von Helene Weber beschäftigt. In dieser interaktiven Ausstellung stellen sie diese Visionen der heutigen Realität (2025) gegenüber. Die Fakten zur Realität stammen dabei aus aktuellen Quellen.</p>
+            
+            <p>Deine Aufgabe ist es nun, selbst in die Reflexion zu gehen:</p>
+            <ul>
+                <li>Für jede Forderung von Helene Weber bitten wir dich, selbstkritisch einzuschätzen, zu welchem Prozentsatz diese Forderung heutzutage in Deutschland umgesetzt ist (0% = Vision verfehlt, 100% = Vision erfüllt).</li>
+                <li>Du bewegst dich dabei sequenziell durch die Forderungen. Am Ende siehst du deine persönliche Bilanz.</li>
+                <li>Achte auf die Hinweis-Buttons (i), die bei einigen Forderungen angezeigt werden und weiterführende Informationen zu Aspekten von Helene Webers Engagement für die Frauenbewegung herausstreichen.</li>
+            </ul>
+        </div>
+        
+        <button class="next-scene-button next-scene-button-start" onclick="startExhibition()">Zur ersten Forderung</button>
+    </div>
+
+    <div id="abschlussszene" class="scene locked" data-scene-id="6">
+        <h1>Abschluss</h1>
+        <h2>Deine persönliche Bilanz des Fortschritts im Jahr 2025</h2>
+        <div id="gesamtauswertung" style="margin-top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center;">
+            </div>
+        <p style="margin-top: 50px;">Vielen Dank für deine Teilnahme! Der Wandel ist im Gange, aber die Forderungen von Helene Weber bleiben auch heute noch relevant.</p>
+
+        <button class="next-scene-button" onclick="resetRatings()">Forderungen neu bewerten</button>
+    </div>
+
+    <script>
+        // JavaScript-Teil
+        
+        const demands = [
+            { 
+                id: 1, 
+                title: "Soziale und politische Gleichberechtigung der Frau", 
+                short_title: "Politische/Soziale Gleichstellung",
+                vision: "Soziale und politische Gleichberechtigung der Frau", 
+                achievement: "Sie war Mitbegründerin des Deutschen Frauenrings und setzte sich aktiv für Frauenrechte ein.",
+                reality: {
+                    fact: "Deutschland liegt im Global Gender Gap Index in der politischen Teilhabe noch immer hinter vielen Ländern. Trotz gleicher Rechte sind Frauen auf allen politischen Ebenen unterrepräsentiert (z.B. Bundestag, Landtage, Kommunalpolitik).",
+                    source: "Global Gender Gap Report / Deutscher Bundestag"
+                }
+            },
+            { 
+                id: 2, 
+                title: "Reformierung der Sozial- und Fürsorgearbeit", 
+                short_title: "Anerkennung der Fürsorgearbeit",
+                vision: "Reformierung der Sozialpolitik und die Förderung von Fürsorgearbeit, insbesondere für katholische Frauen.", 
+                achievement: 'Sie war in der <span style="font-weight: bold;">katholischen Sozialarbeit</span> tätig und trug zur Entwicklung der Wohlfahrtsarbeit bei.',
+                reality: {
+                    fact: "Die Anerkennung und Vergütung von Pflege- und Sozialberufen, in denen mehrheitlich Frauen arbeiten, bleibt ein zentrales Problem. Die Fürsorgearbeit (Care-Arbeit) ist weiterhin finanziell unterbewertet.",
+                    source: "Deutsches Institut für Wirtschaftsforschung (DIW)"
+                }
+            },
+            { 
+                id: 3, 
+                title: "Verbesserung der Lebensbedingungen (Bildung, Ehe, Familie)", 
+                short_title: "Bildung, Ehe & Familie",
+                vision: "Verbesserung der Lebensbedingungen von Frauen insbesondere Bildung, Ehe und Familie.", 
+                achievement: "Sie engagierte sich für bessere Bildungsmöglichkeiten und familienpolitische Maßnahmen.",
+                reality: {
+                    fact: "Obwohl Frauen höhere Bildungsabschlüsse erzielen, führt dies oft nicht zu gleichwertigen Karrierewegen. Traditionelle Rollenbilder beeinflussen nach wie vor die Aufteilung von Familienaufgaben (Gender Care Gap).",
+                    source: "Bundesministerium für Familie, Senioren, Frauen und Jugend"
+                }
+            },
+            { 
+                id: 4, 
+                title: "Gleichstellung von Frauen in der Politik (Grundgesetz)", 
+                short_title: "Frauenanteil in der Politik",
+                vision: "Gleichstellung von Frauen in der Politik.", 
+                achievement: "Eine der vier Frauen, die das Grundgesetz mitgestaltet hat und setzte sich dort für Gleichberechtigung ein (Art. 3 Abs. 2 GG).",
+                reality: {
+                    fact: "Der Frauenanteil im Deutschen Bundestag liegt derzeit bei ca. 35%. Die Debatte um Paritätsgesetze zeigt, dass die vollständige Gleichstellung in der politischen Führung noch nicht erreicht ist.",
+                    source: "Deutscher Bundestag"
+                }
+            },
+            { 
+                id: 5, 
+                title: "Gleiche Löhne für gleiche Arbeit", 
+                short_title: "Gleicher Lohn für gleiche Arbeit",
+                vision: "Gleiche Löhne für gleiche Arbeit (egal welches Geschlecht).", 
+                achievement: "Sie diskutiert das Thema Lohngleichheit öffentlich und setzt sich dafür ein, auch wenn es in ihrer Zeit nicht vollständig umgesetzt wurde.",
+                reality: {
+                    fact: "Der Gender Pay Gap in Deutschland beträgt noch immer ca. 18% (unbereinigt). Strukturelle Ungleichheiten und fehlende Transparenz erschweren die vollständige Umsetzung dieser Kernforderung.",
+                    source: "Statistisches Bundesamt"
+                }
+            }
+        ];
+        
+        const totalDemands = demands.length;
+        let currentActiveScene = 0; 
+        let ratings = {};
+        let inactivityTimer;
+        const INACTIVITY_TIME = 3 * 60 * 1000; // 3 Minuten
+        
+        // --- Initiale Funktionen und Timer ---
+
+        function init() {
+            insertScenes();
+            document.getElementById('willkommen').classList.add('locked'); 
+            resetInactivityTimer();
+            sessionStorage.removeItem('finalAudioPlayed');
+        }
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(activateStartScreen, INACTIVITY_TIME);
+        }
+
+        function activateStartScreen() {
+            const audio = document.getElementById('finalPreistraegerinAudio');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            
+            resetExhibitionData(); 
+            document.getElementById('startbildschirm').style.display = 'flex';
+        }
+
+        function hideStartScreen() {
+            document.getElementById('startbildschirm').style.display = 'none';
+            activateWelcomeScene(); 
+            resetInactivityTimer(); 
+        }
+        
+        function activateWelcomeScene() {
+             const welcome = document.getElementById('willkommen');
+             if(welcome) {
+                 welcome.classList.remove('locked');
+                 welcome.classList.add('unlocked');
+                 currentActiveScene = 0;
+                 welcome.scrollIntoView({ behavior: 'smooth' });
+             }
+        }
+
+        function createSceneMarkup(demand) {
+            const infoButton = (demand.id === 2) 
+                ? '<button class="info-button" onclick="openModal(event)">i</button>' 
+                : '';
+
+            return `
+                <div id="szene-${demand.id}" class="scene locked" data-scene-id="${demand.id}" onclick="returnToCompletedScene(${demand.id})">
+                    <h2>Forderung ${demand.id}: ${demand.title}</h2>
+                    
+                    <div class="past-info-wrapper">
+                        <div class="past-container">
+                            <div class="past-box">
+                                <h4>Was wollte Helene Weber erreichen?</h4>
+                                <p>"${demand.vision}"</p>
+                            </div>
+                            <div class="past-box">
+                                <h4>Was hat Helene Weber erreicht?</h4>
+                                <p>${demand.achievement}</p>
+                            </div>
+                        </div>
+                        ${infoButton}
+                    </div>
+
+                    <div class="present" id="present-${demand.id}">
+                        <h3>Die heutige Realität (2025)</h3>
+                        <p><strong>Fakt:</strong> ${demand.reality.fact}</p>
+                        <small>Quelle: ${demand.reality.source}</small>
+                    </div>
+
+                    <div class="bewertung" id="bewertung-${demand.id}">
+                        <h4>Wie würdest du den Fortschritt dieser Forderung heute bewerten?</h4>
+                        <div class="percent-display" id="percent-display-${demand.id}">50%</div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="50" class="rating-slider" data-scene="${demand.id}" oninput="updateRating(this)">
+                            <div class="slider-labels">
+                                <span>Vision verfehlt (0%)</span>
+                                <span>Vision erfüllt (100%)</span>
+                            </div>
+                        </div>
+                        <button class="next-scene-button" onclick="completeScene(${demand.id})" disabled>Fortschritt bewerten & nächste Forderung</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function insertScenes() {
+            const welcomeScene = document.getElementById('willkommen');
+            const endScene = document.getElementById('abschlussszene');
+            if (welcomeScene && endScene) {
+                let allScenesHTML = '';
+                demands.forEach(demand => {
+                    allScenesHTML += createSceneMarkup(demand);
+                });
+                welcomeScene.insertAdjacentHTML('afterend', allScenesHTML);
+            }
+        }
+        
+        function openModal(event) {
+            event.stopPropagation();
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // --- NEUE Funktionen für das finale Audio-Popup ---
+        
+        function showFinalAudioPrompt() {
+            if (sessionStorage.getItem('finalAudioPlayed') === 'true') {
+                return;
+            }
+            
+            // Setze das Modal in den initialen Zustand zurück
+            document.getElementById('audioPlayerContainer').style.display = 'none';
+            document.getElementById('audioPromptButtons').style.display = 'flex';
+            document.getElementById('audioCloseButton').style.display = 'none';
+            
+            document.getElementById('finalAudioModal').style.display = 'flex';
+        }
+
+        function handleFinalAudioChoice(play) {
+            const modal = document.getElementById('finalAudioModal');
+            const audioContainer = document.getElementById('audioPlayerContainer');
+            const audio = document.getElementById('finalPreistraegerinAudio');
+            
+            if (play) {
+                // Benutzer will hören: Player zeigen
+                document.getElementById('audioPromptButtons').style.display = 'none';
+                audioContainer.style.display = 'block';
+                document.getElementById('audioCloseButton').style.display = 'flex';
+                
+                // Setze Audio zurück, falls es zuvor schon einmal gestartet wurde
+                if (audio) {
+                    audio.pause(); 
+                    audio.currentTime = 0;
+                    // Der Benutzer startet die Wiedergabe über die Player-Controls
+                }
+                
+                // Flag wird gesetzt, damit Popup nicht erneut öffnet, bis Reset
+                sessionStorage.setItem('finalAudioPlayed', 'true');
+                
+            } else {
+                // Benutzer will fortfahren (über "Nein" oder "Zurückkehren"-Button)
+                modal.style.display = 'none';
+                if (audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                // Flag wird gesetzt, damit Popup nicht erneut öffnet, bis Reset
+                sessionStorage.setItem('finalAudioPlayed', 'true');
+            }
+        }
+        // --- ENDE NEUE Funktionen für das finale Audio-Popup ---
+
+
+        function updateRating(slider) {
+            resetInactivityTimer();
+            const sceneId = slider.dataset.scene;
+            const value = parseInt(slider.value);
+            const percentDisplay = document.getElementById(`percent-display-${sceneId}`);
+            
+            percentDisplay.textContent = `${value}%`;
+            ratings[sceneId] = value;
+            
+            const button = document.querySelector(`#bewertung-${sceneId} .next-scene-button`);
+            if (button) {
+                button.disabled = false;
+                if (parseInt(sceneId) === totalDemands) {
+                    button.textContent = "Zur finalen Auswertung";
+                }
+            }
+        }
+        
+        function startExhibition() {
+            const welcome = document.getElementById('willkommen');
+            if(welcome) {
+                welcome.classList.add('completed');
+                welcome.classList.remove('unlocked');
+                welcome.scrollIntoView({ behavior: 'smooth' });
+                activateScene(1);
+            }
+        }
+        
+        function activateScene(id) {
+            if (id > totalDemands + 1) return;
+
+            const sceneToActivate = document.getElementById(id === totalDemands + 1 ? 'abschlussszene' : `szene-${id}`);
+            
+            if (sceneToActivate) {
+                sceneToActivate.classList.remove('locked');
+                currentActiveScene = id;
+                
+                setTimeout(() => {
+                    sceneToActivate.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+                
+                checkScrollEffects(id);
+            }
+        }
+        
+        function completeScene(id) {
+            resetInactivityTimer();
+            const currentScene = document.getElementById(`szene-${id}`);
+            if (currentScene) {
+                currentScene.classList.add('completed');
+                activateScene(id + 1);
+            }
+        }
+        
+        function returnToCompletedScene(id) {
+            const scene = document.getElementById(`szene-${id}`);
+            if (scene && scene.classList.contains('completed') && id !== currentActiveScene) {
+                scene.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function checkScrollEffects(id) {
+            if (id === 0) return;
+            
+            const scene = document.getElementById(id === totalDemands + 1 ? 'abschlussszene' : `szene-${id}`);
+            if (!scene || scene.classList.contains('locked')) return;
+            
+            const windowHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+            const sceneTop = scene.offsetTop;
+            const sceneBottom = sceneTop + scene.offsetHeight;
+
+            if (scrollY + windowHeight > sceneTop && scrollY < sceneBottom) {
+                
+                if (id <= totalDemands) {
+                    const presentDiv = document.getElementById(`present-${id}`);
+                    const bewertungDiv = document.getElementById(`bewertung-${id}`);
+                    const scrollProgress = Math.max(0, Math.min(1, (scrollY - sceneTop + windowHeight * 0.7) / (scene.offsetHeight / 2)));
+
+                    if (scrollProgress > 0.3 && presentDiv && !presentDiv.classList.contains('visible')) {
+                        presentDiv.classList.add('visible');
+                    }
+                    
+                    if (scrollProgress > 0.7 && bewertungDiv && !bewertungDiv.classList.contains('visible')) {
+                        bewertungDiv.classList.add('visible');
+                    }
+                }
+                
+                if (id === totalDemands + 1) {
+                    generateSummary();
+                }
+            }
+        }
+        
+        function generateSummary() {
+            const summaryDiv = document.getElementById('gesamtauswertung');
+            if (summaryDiv.innerHTML.trim() !== '') {
+                setTimeout(showFinalAudioPrompt, 500);
+                return; 
+            }
+
+            let listHTML = '<ul class="summary-list">';
+            let totalRating = 0;
+            let count = 0;
+
+            demands.forEach(demand => {
+                const rating = ratings[demand.id] !== undefined ? ratings[demand.id] : 50; 
+                
+                listHTML += `
+                    <li>
+                        <strong>${demand.short_title}</strong> 
+                        <span class="summary-percent">${rating}%</span>
+                    </li>
+                `;
+                
+                totalRating += rating;
+                count++;
+            });
+            
+            const average = count > 0 ? Math.round(totalRating / count) : 0;
+            
+            listHTML += '</ul>';
+            
+            listHTML += `<div class="summary-average">Gesamtdurchschnitt deiner Bewertungen: ${average}%</div>`;
+            
+            summaryDiv.innerHTML = listHTML;
+            
+            setTimeout(showFinalAudioPrompt, 500); 
+        }
+
+        function resetExhibitionData() {
+            const audio = document.getElementById('finalPreistraegerinAudio');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            
+            ratings = {}; 
+            document.getElementById('gesamtauswertung').innerHTML = '';
+            sessionStorage.removeItem('finalAudioPlayed'); 
+
+            const welcome = document.getElementById('willkommen');
+            if (welcome) {
+                 welcome.classList.remove('completed');
+                 welcome.classList.remove('unlocked');
+                 welcome.classList.add('locked');
+            }
+            
+            document.getElementById('abschlussszene').classList.add('locked');
+            
+            demands.forEach(demand => {
+                const scene = document.getElementById(`szene-${demand.id}`);
+                if (scene) {
+                    scene.classList.remove('completed');
+                    scene.classList.add('locked');
+                    
+                    const slider = document.querySelector(`#szene-${demand.id} .rating-slider`);
+                    const display = document.getElementById(`percent-display-${demand.id}`);
+                    const button = document.querySelector(`#bewertung-${demand.id} .next-scene-button`);
+
+                    if (slider) slider.value = 50;
+                    if (display) display.textContent = '50%';
+                    if (button) {
+                        button.disabled = true;
+                        if (demand.id === totalDemands) {
+                            button.textContent = "Fortschritt bewerten & nächste Forderung"; 
+                        }
+                    }
+                    
+                    document.getElementById(`present-${demand.id}`).classList.remove('visible');
+                    document.getElementById(`bewertung-${demand.id}`).classList.remove('visible');
+                }
+            });
+            currentActiveScene = 0;
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function resetRatings() {
+            resetExhibitionData();
+            activateStartScreen(); 
+        }
+
+        // Event Listener
+        window.addEventListener('load', init);
+        
+        window.addEventListener('scroll', () => {
+             checkScrollEffects(currentActiveScene); 
+             resetInactivityTimer();
+        });
+
+    </script>
+
+</body>
+</html>
