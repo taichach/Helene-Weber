@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wer wird Grundgesetz-Kenner? (Helene Weber Quiz)</title>
+    <style>
+        /* --- Screensaver CSS --- */
+        .screensaver-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 3000; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* ANPASSUNG: Am unteren Rand ausrichten */
+            padding-bottom: 10vh; /* ANPASSUNG: Abstand vom unteren Rand (z.B. 10% der Viewporthöhe) */
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            cursor: pointer;
+        }
+
+        .screensaver-overlay.hidden {
+            opacity: 0;
+            pointer-events: none; 
+        }
+        
+        .screensaver-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.8; 
+        }
+        
+        .screensaver-text {
+            position: relative;
+            z-index: 3001;
+            color: #ffcc00;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 0 0 10px #000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* --- Standard CSS (Optimiert für Vollbild/kein Scrollen) --- */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000033; 
+            color: #ffffff;
+            margin: 0; /* WICHTIG: Entfernt Standard-Margin des Browsers */
+            padding: 0; /* WICHTIG: Entfernt Standard-Padding */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Zentriert vertikal das Haupt-Content-Element */
+            min-height: 100vh;
+            overflow-x: hidden; /* Verhindert das horizontale Scrollen des ganzen Bodys */
+        }
+
+        /* NEU: WWM Startbildschirm Styling (Höhenoptimiert) */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 800px;
+            max-width: 95%;
+            min-height: 400px;
+            padding: 30px 40px; 
+            background-color: #000022;
+            border-radius: 10px;
+            border: 5px solid #ffcc00; 
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.5);
+            text-align: center;
+            animation: fadeIn 1s;
+            margin: 20px 0; /* Fügt vertikalen Abstand hinzu, falls der Inhalt zu lang ist */
+        }
+
+        .start-screen h1 {
+            font-size: 3em;
+            color: #ffcc00; 
+            margin-bottom: 15px; 
+            text-shadow: 0 0 5px #ff6600;
+        }
+        
+        .start-screen p {
+            font-size: 1.2em;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .instruction-box {
+            background-color: #000044;
+            border: 1px solid #0099ff;
+            padding: 15px 20px; 
+            border-radius: 8px;
+            margin: 15px 0 20px; 
+            text-align: left;
+            width: 100%;
+            max-width: 700px; 
+        }
+
+        .instruction-box h2 {
+            color: #0099ff;
+            font-size: 1.5em;
+            margin-top: 0;
+        }
+
+        .instruction-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instruction-box li {
+            margin-bottom: 10px;
+        }
+        
+        /* ENDSCHIRM STYLING */
+        .end-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 800px;
+            max-width: 95%;
+            min-height: 400px;
+            padding: 40px;
+            background-color: #000022;
+            border-radius: 10px;
+            border: 5px solid #ffcc00; 
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.5);
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .end-screen h1 {
+            font-size: 3em;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        #end-message {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        /* WWM Start Button Styling */
+        .start-button {
+            padding: 15px 40px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #000022;
+            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%); 
+            border: 3px solid #ffffff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5), 0 0 15px #ffcc00;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7), 0 0 20px #ff9900;
+        }
+        
+        /* HAUPTCONTAINER ANPASSUNG */
+        .quiz-container {
+            display: flex;
+            width: 100%; /* NEU: Nimmt die volle Breite ein */
+            max-width: 1400px; /* NEU: Maximale Breite für große Bildschirme */
+            margin: 20px auto; /* Zentriert und gibt etwas vertikalen Puffer */
+            background-color: #000033;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0, 0, 80, 0.7);
+            overflow-x: hidden; /* Verhindert horizontale Scrollleiste am Container */
+        }
+
+        .main-content {
+            flex: 2;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .status-sidebar {
+            flex: 1;
+            padding: 20px 0;
+            background-color: #000022; 
+            border-left: 5px solid #ffcc00;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Joker-Bereich */
+        .joker-container {
+            text-align: center;
+            padding: 10px 20px;
+            display: flex; 
+            flex-direction: row; 
+            justify-content: space-between; 
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .joker-button {
+            padding: 10px 10px; 
+            font-size: 1.1em; 
+            cursor: pointer;
+            border: 2px solid;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48%; 
+        }
+        
+        /* Stil für AKTIVEN Joker */
+        .joker-button:not([disabled]) {
+            background-color: #0099ff; /* Blau für aktive Hilfe */
+            color: #ffffff;
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 153, 255, 0.7);
+        }
+        
+        /* Standard: Deaktiviert */
+        .joker-button[disabled] {
+            background-color: #333333;
+            color: #888888;
+            border-color: #555555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .joker-icon {
+            margin-right: 5px; 
+            font-size: 1.2em; 
+        }
+        
+        /* --- Modal Styles --- */
+        .hint-modal { 
+            position: fixed;
+            z-index: 2000; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #000033;
+            padding: 30px;
+            border: 3px solid #ffcc00;
+            border-radius: 10px;
+            box-shadow: 0 0 30px #ffcc00;
+            display: flex; /* Flexbox für Zentrierung der Inhalte */
+            flex-direction: column;
+            align-items: center; /* NEU: Zentriert die Kindelemente horizontal */
+            max-width: 600px;
+        }
+        
+        .hint-modal .modal-content h2 {
+            color: #ffcc00;
+            font-size: 2em;
+            margin-top: 0;
+            text-align: center; 
+        }
+        
+        .hint-modal .modal-content p {
+            font-size: 1.1em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Styling für das Audio/Video-Element im Modal */
+        .joker-media-element {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 10px;
+            display: block; /* Stellt sicher, dass Medienelemente als Block behandelt werden */
+            margin-left: auto; /* NEU: Auto-Margin links */
+            margin-right: auto; /* NEU: Auto-Margin rechts */
+        }
+        
+        /* Video-spezifisches Styling */
+        #joker-video-element {
+            max-height: 40vh; /* Begrenze die Höhe des Videos */
+        }
+        
+        .hint-modal .modal-content ul {
+            list-style: disc outside;
+            padding-left: 25px;
+            text-align: left;
+            font-size: 1.2em;
+            color: #ffffff;
+        }
+        
+        .hint-modal .modal-content li {
+            margin-bottom: 10px;
+        }
+
+        .close-button {
+            color: #ffcc00;
+            font-size: 40px;
+            font-weight: bold;
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #fff;
+        }
+        /* --- Ende Modal Styles --- */
+
+
+        /* --- Quiz-Frage-Bereich --- */
+        #question-display {
+            background-color: #000055;
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 2px solid #0099ff;
+            box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
+            margin-bottom: 30px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #question-text {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* --- Antwort-Bereich --- */
+        #answer-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .answer-button {
+            background-color: #333366; 
+            color: #ffffff;
+            padding: 15px 20px;
+            border: 2px solid #666699;
+            border-radius: 5px;
+            text-align: left;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s, transform 0.1s;
+            display: flex;
+            flex-direction: column; 
+            align-items: flex-start;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .answer-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .answer-label {
+            color: #ffcc00; 
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        /* Feedback-Farben */
+        .answer-button.correct {
+            background-color: #006600; 
+            border-color: #00ff00; 
+        }
+
+        .answer-button.incorrect {
+            background-color: #660000; 
+            border-color: #ff0000; 
+        }
+        
+        /* --- Statusanzeige Grundrechte --- */
+        .status-list {
+            list-style: none;
+            padding: 0 20px;
+            margin: 0;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .status-item.active {
+            background-color: #ffcc00; 
+            color: #000000;
+            font-weight: bold;
+            border: 1px solid #ffffff;
+        }
+        
+        /* --- RESPONSIVE ANPASSUNGEN --- */
+        @media (max-width: 1000px) {
+            .quiz-container {
+                width: 98%;
+                flex-direction: column;
+                margin: 0 auto;
+            }
+            .status-sidebar {
+                border-left: none;
+                border-top: 5px solid #ffcc00;
+                order: -1; 
+                width: 100%;
+            }
+            .main-content {
+                padding: 20px;
+                width: 100%;
+            }
+            #answer-options {
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+            .joker-container {
+                flex-direction: column; 
+                gap: 10px;
+            }
+            .joker-button {
+                width: 100%; 
+            }
+            #answer-options {
+                grid-template-columns: 1fr; 
+            }
+            #question-text {
+                font-size: 1.5em;
+            }
+            .status-list {
+                padding: 0 10px;
+            }
+            .start-screen h1 {
+                font-size: 2.5em;
+            }
+            .start-button {
+                font-size: 1.5em;
+            }
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body onload="setupScreensaver()">
+
+    <div class="screensaver-overlay" id="screensaver-overlay">
+        <img id="screensaver-image" class="screensaver-image" src="" alt="Mütter des Grundgesetzes">
+        <div class="screensaver-text">
+            Tippen Sie auf den Bildschirm, um das Quiz zu starten
+        </div>
+    </div>
+    <div class="start-screen" id="start-screen" style="display: none;">
+        <h1>Wer wird Millionär - Grundgesetz Edition 🧐</h1>
+        
+        <div class="instruction-box">
+            <h2>Spielanleitung:</h2>
+            <ul>
+                <li>➡️ Beantworten Sie 10 Fragen zum Grundgesetz und den Müttern des Grundgesetzes.</li>
+                <li>🏆 Für jede richtige Antwort schalten Sie ein weiteres Grundrecht in der Statusleiste frei.</li>
+                <li>❌ Bei einer falschen Antwort endet das Quiz sofort.</li>
+                <li>
+                    💡 Joker-Funktion (Hilfe & Telefonjoker):
+                    <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.9em; color: #b3d9ff;">
+                        Der Hilfe-Joker liefert kurze, von Schüler*innen erarbeitete Tipps zur Frage (gesamt einmalig nutzbar, nur bei bestimmten Fragen). Der Telefonjoker (gesamt einmalig nutzbar, nur bei bestimmten Fragen) bietet Interview-Schnipsel oder Zeitzeugenberichte zu Helene Webers Biographie (aus dem WDR-Archiv).
+                    </p>
+                    <p style="margin-top: 5px; font-size: 0.9em; color: #ff9900;">
+                        Hinweis: Ist der Hilfe-Joker deaktiviert, können die Informationstexte an den Ausstellern hilfreich sein.
+                    </p>
+                </li>
+            </ul>
+        </div>
+        
+        <button class="start-button" onclick="startGame()">JETZT INS SPIEL STARTEN</button>
+    </div>
+
+    <div class="hint-modal" id="media-joker-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeMediaModal()">&times;</span>
+            <div id="media-content" style="text-align: center;">
+                <h2>📞 Telefonjoker: Archiv-Ausschnitt</h2>
+                <p id="media-hint">Bitte setzen Sie die Ohrmuschel auf, um den historischen Ausschnitt zu starten.</p>
+                
+                <video id="joker-video-element" class="joker-media-element" controls preload="auto" style="display: none;">
+                    Ihr Browser unterstützt das Video-Element nicht.
+                </video>
+                
+                <audio id="joker-audio-element" class="joker-media-element" controls preload="auto" style="display: none;">
+                    Ihr Browser unterstützt das Audio-Element nicht.
+                </audio>
+            </div>
+            <button onclick="closeMediaModal()" class="start-button" style="margin-top: 20px;">Schließen</button>
+        </div>
+    </div>
+    <div class="hint-modal" id="hint-joker-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeHintModal()">&times;</span>
+            <div id="hint-content">
+                </div>
+            <button onclick="closeHintModal()" class="start-button" style="margin-top: 20px;">Schließen</button> 
+        </div>
+    </div>
+    <div class="end-screen" id="end-screen" style="display: none;">
+        <h1>Quiz beendet!</h1>
+        <p id="end-message"></p>
+        
+        <button class="start-button" onclick="showStartScreen()">NEUSTARTEN</button>
+    </div>
+
+    <div class="quiz-container" id="quiz-container" style="display: none;">
+        
+        <div class="main-content">
+            <div id="question-display">
+                <p id="question-text">Die Frage erscheint hier...</p>
+            </div>
+            
+            <div id="answer-options">
+                </div>
+        </div>
+        
+        <div class="status-sidebar">
+            <div class="joker-container">
+                <button id="audience-joker-button" class="joker-button" disabled onclick="useHelpJoker()">
+                    <i class="fas fa-handshake joker-icon"></i>
+                    Hilfe
+                </button>
+                
+                <button id="phone-joker-button" class="joker-button" disabled onclick="usePhoneJoker()">
+                    <i class="fas fa-phone-alt joker-icon"></i>
+                    Telefonjoker
+                </button>
+            </div>
+
+            <h2 style="text-align: center; color: #ffcc00; margin-top: 0;">Grundrechte-Status</h2>
+            <p style="text-align: center; font-size: 0.9em; margin-bottom: 10px;">(10 Fragen, 10 Grundrechte)</p>
+            <ul class="status-list" id="status-list">
+                </ul>
+        </div>
+
+    </div>
+
+    <script>
+        const totalQuestions = 10;
+        let phoneJokerUsed = false; 
+        let helpJokerUsed = false; 
+        
+        // Screensaver-Konstanten
+        const SCREENSAVER_IMAGE_URL = "muetter_des_grundgesetzes.jpg"; 
+        const SCREENSAVER_TIMEOUT_MS = 180000; // 3 Minuten (180 Sekunden * 1000)
+        let screensaverTimeout;
+        
+        
+        // --- Neuer Hilfetext für die Fragen 16-19 ---
+        const GENERAL_GRUNDRECHTE_HINT = `
+            <h2>Hilfe-Tipp: Wichtige Grundrechte</h2>
+            <ul>
+                <li>Art. 1: Menschenwürde ist unantastbar</li>
+                <li>Art. 2: Persönlichkeitsrecht</li>
+                <li>Art. 3: Gleichheit</li>
+                <li>Art. 4: Religionsfreiheit</li>
+                <li>Art. 5: Meinungsfreiheit</li>
+                <li>Art. 6: Schutz von Ehe & Familie</li>
+                <li>Art. 8: Versammlungsfreiheit</li>
+                <li>Art. 9: Vereinigungsfreiheit</li>
+                <li>Art. 10: Kommunikationsgeheimnis</li>
+                <li>Art. 11: Freizügigkeit</li>
+                <li>Art. 12: Berufsfreiheit</li>
+                <li>Art. 14: Eigentumsschutz</li>
+                <li>Art. 16a: Asylrecht</li>
+            </ul>
+        `;
+        
+        // Zentrales Objekt für Hilfe-Joker-Hinweise
+        const JOKER_HINTS = {
+            // Alte Fragen
+            9: `
+                <h2>Hilfe-Tipp: Wer wird geschützt?</h2>
+                <ul>
+                    <li>Verfassung Deutschlands</li>
+                    <li>Schützt Rechte und Freiheiten aller Bürger</li>
+                    <li>Grundlage der Demokratie</li>
+                </ul>
+            `,
+            10: `
+                <h2>Hilfe-Tipp: Grundrechte</h2>
+                <ul>
+                    <li>Gelten unmittelbar — für alle</li>
+                    <li>Schützen vor staatlicher Willkür</li>
+                    <li>Jeder kann sich direkt darauf berufen</li>
+                </ul>
+            `,
+            11: `
+                <h2>Hilfe-Tipp: Die Rolle des Grundgesetzes</h2>
+                <ul>
+                    <li>Verfassung der Bundesrepublik Deutschland</li>
+                    <li>Rechtliche Grundordnung der Bundesrepublik Deutschland</li>
+                    <li>Beschützt die Demokratie und legt Prinzipien und Ziele fest</li>
+                    <li>Ist über alle anderen Gesetze geordnet</li>
+                </ul>
+            `,
+            // Neue Fragen mit dem allgemeinen Grundrechte-Tipp
+            16: GENERAL_GRUNDRECHTE_HINT,
+            17: GENERAL_GRUNDRECHTE_HINT,
+            18: GENERAL_GRUNDRECHTE_HINT,
+            19: GENERAL_GRUNDRECHTE_HINT
+        };
+        
+        // ********** NEUE KONSTANTE FÜR MEDIENPFADE DES TELEFONJOKERS **********
+        // Die ID entspricht der ID im QuizData-Array
+        const PHONE_JOKER_MEDIA = {
+            1: { type: 'video', src: 'tj_frage1.mp4' },
+            2: { type: 'video', src: 'tj_frage2.mp4' },
+            5: { type: 'audio', src: 'frage5.mp3' }
+        };
+        
+        // Konstante für die IDs, bei denen der Telefonjoker aktiv ist (Frage 1, 2 und 5)
+        const PHONE_JOKER_ACTIVE_IDS = [1, 2, 5]; 
+
+
+        const quizData = [
+            { "id": 1, "question": "Wie viele Politiker*innen waren im Parlamentarischen Rat insgesamt vertreten?", "answerOptions": [{"text": "61", "isCorrect": false}, {"text": "4", "isCorrect": false}, {"text": "65", "isCorrect": true}, {"text": "73", "isCorrect": false}] },
+            { "id": 2, "question": "Welche Partei vertrat Helene Weber im Parlamentarischen Rat?", "answerOptions": [{"text": "SPD", "isCorrect": false}, {"text": "CDU", "isCorrect": true}, {"text": "Zentrum", "isCorrect": false}, {"text": "FDP", "isCorrect": false}] },
+            { "id": 3, "question": "Welche besondere Bezeichnung haben die vier Frauen des Parlamentarischen Rates erhalten?", "answerOptions": [{"text": "Gründungsfrauen", "isCorrect": false}, {"text": "Frauen des Rates", "isCorrect": false}, {"text": "Mütter des Grundgesetzes", "isCorrect": true}, {"text": "Grundrechtspionierinnen", "isCorrect": false}] },
+            { "id": 4, "question": "Wann trat das Grundgesetz in Kraft?", "answerOptions": [{"text": "1949", "isCorrect": true}, {"text": "1918", "isCorrect": false}, {"text": "2000", "isCorrect": false}, {"text": "1933", "isCorrect": false}] },
+            { "id": 5, "question": "Für welches Thema setzte sich Helene Weber besonders ein?", "answerOptions": [{"text": "Steuerpolitik", "isCorrect": false}, {"text": "Gleichberechtigung von Frauen und Männern", "isCorrect": true}, {"text": "Verkehrspolitik", "isCorrect": false}, {"text": "Militärische Verteidigung", "isCorrect": false}] },
+            { "id": 6, "question": "Welche Formulierung aus dem Grundgesetz entstand durch die Arbeit der „Mütter des Grundgesetzes“?", "answerOptions": [{"text": "„Alle Bürgerinnen und Bürger zahlen Steuern.“", "isCorrect": false}, {"text": "„Männer und Frauen sind gleichberechtigt. Der Staat fördert die tatsächliche Durchsetzung der Gleichberechtigung von Frauen und Männern und wirkt auf die Beseitigung bestehender Nachteile hin.“", "isCorrect": true}, {"text": "„Jeder hat das Recht auf Bildung.“", "isCorrect": false}, {"text": "„Die Presse ist frei und darf nicht zensiert werden.“", "isCorrect": false}] },
+            { "id": 7, "question": "Welche Aussage ist richtig?", "answerOptions": [{"text": "Helene Weber arbeitete zusammen mit drei weiteren Frauen im Parlamentarischen Rat.", "isCorrect": true}, {"text": "Helene Weber arbeitete alleine an der Gleichberechtigung.", "isCorrect": false}, {"text": "Helene Weber war die einzige Frau im Parlamentarischen Rat.", "isCorrect": false}, {"text": "Helene Weber war nur als Beobachterin anwesend.", "isCorrect": false}] },
+            { "id": 8, "question": "Warum wird die Arbeit der vier Frauen bis heute besonders gewürdigt?", "answerOptions": [{"text": "Sie gründeten Schulen.", "isCorrect": false}, {"text": "Sie sorgten dafür, dass Frauenrechte im Grundgesetz verankert wurden.", "isCorrect": true}, {"text": "Sie führten neue Gesetze zur Wirtschaft ein.", "isCorrect": false}, {"text": "Sie erfanden die Bundesflagge.", "isCorrect": false}] },
+            { "id": 9, "question": "Für wen gilt das Grundgesetz?", "answerOptions": [{"text": "Nur für Kinder", "isCorrect": false}, {"text": "Nur für Politiker*innen", "isCorrect": false}, {"text": "Für alle Menschen in Deutschland", "isCorrect": true}, {"text": "Nur für deutsche Staatsbürger.", "isCorrect": false}] },
+            { "id": 10, "question": "Was schützt das Grundgesetz?", "answerOptions": [{"text": "Die Rechte aller Menschen", "isCorrect": true}, {"text": "Nur die Tiere", "isCorrect": false}, {"text": "Nur die Politiker*innen", "isCorrect": false}, {"text": "Ausschließlich das Staatseigentum", "isCorrect": false}] },
+            { "id": 11, "question": "Warum ist das Grundgesetz wichtig?", "answerOptions": [{"text": "Es regelt, wie Deutschland funktioniert und schützt die Menschenrechte", "isCorrect": true}, {"text": "Es ist nur ein altes Buch", "isCorrect": false}, {"text": "Es entscheidet, wer gewinnt", "isCorrect": false}, {"text": "Es legt fest, welche Farben Deutschland im Sport tragen muss", "isCorrect": false}] },
+            { "id": 12, "question": "Wann wurde das Grundgesetz verabschiedet?", "answerOptions": [{"text": "6. Mai 1949", "isCorrect": false}, {"text": "8. Mai 1952", "isCorrect": false}, {"text": "8. Mai 1949", "isCorrect": true}, {"text": "10. Mai 1952", "isCorrect": false}] },
+            { "id": 13, "question": "Warum heißen Helene Weber und ihre Kolleginnen „Mütter des Grundgesetzes“?", "answerOptions": [{"text": "Weil sie Kinder hatten", "isCorrect": false}, {"text": "Weil sie maßgeblich das Grundgesetz mitgestaltet haben", "isCorrect": true}, {"text": "Weil sie Lehrerinnen waren", "isCorrect": false}, {"text": "Weil sie die einzigen Frauen in der deutschen Politik waren", "isCorrect": false}] },
+            { "id": 14, "question": "Welches Ziel verfolgten die „Mütter des Grundgesetzes“ besonders?", "answerOptions": [{"text": "Mehr Autobahnen bauen", "isCorrect": false}, {"text": "Gleichberechtigung von Frauen und Männern", "isCorrect": true}, {"text": "Neue Gesetze für Landwirtschaft", "isCorrect": false}, {"text": "Die Einführung einer neuen Währung", "isCorrect": false}] },
+            { "id": 15, "question": "Wie viele Frauen waren insgesamt im Parlamentarischen Rat?", "answerOptions": [{"text": "2", "isCorrect": false}, {"text": "4", "isCorrect": true}, {"text": "6", "isCorrect": false}, {"text": "12", "isCorrect": false}] },
+            { "id": 16, "question": "Welche der folgenden Aussagen beschreibt ein tatsächliches Grundrecht aus dem Grundgesetz?", "answerOptions": [{"text": "Recht auf Freizügigkeit", "isCorrect": true}, {"text": "Recht auf ein sicheres Einkommen", "isCorrect": false}, {"text": "Recht auf Arbeit", "isCorrect": false}, {"text": "Recht auf unbefristete Aufenthaltsgenehmigung", "isCorrect": false}] },
+            { "id": 17, "question": "Welches der folgenden Grundrechte ist kein Teil des Grundgesetzes?", "answerOptions": [{"text": "Das Recht auf Asyl", "isCorrect": false}, {"text": "Das Recht auf Eigentum", "isCorrect": false}, {"text": "Das Recht auf den Schutz der Familie", "isCorrect": false}, {"text": "Das Recht auf freies Geleit", "isCorrect": true}] },
+            { "id": 18, "question": "Welche der folgenden Aussagen beschreibt ein Grundrecht im Grundgesetz?", "answerOptions": [{"text": "Das Recht auf eine private Gesundheitsversorgung", "isCorrect": false}, {"text": "Das Recht auf Vereinigungsfreiheit", "isCorrect": true}, {"text": "Das Recht auf sofortige staatliche Hilfe bei Arbeitslosigkeit", "isCorrect": false}, {"text": "Das Recht auf freien Zugang zu jeder Universität", "isCorrect": false}] },
+            { "id": 19, "question": "Welches der folgenden Rechte ist kein Grundrecht?", "answerOptions": [{"text": "Das Recht auf freie Meinungsäußerung", "isCorrect": false}, {"text": "Das Recht auf Versammlungsfreiheit", "isCorrect": false}, {"text": "Das Recht auf einen kostenlosen Rechtsbeistand", "isCorrect": true}, {"text": "Das Recht auf freie Berufswahl", "isCorrect": false}] }
+        ];
+
+        const grundrechteStatus = [
+            "Menschenwürde & Menschenrechte", "Freiheit der Persönlichkeit", "Gleichheit vor dem Gesetz",
+            "Glaubensfreiheit", "Meinungsfreiheit", "Familienrecht", "Schulwesen",
+            "Versammlungsfreiheit", "Vereinigungsfreiheit", "Postgeheimnis" 
+        ];
+
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0;
+        let currentQuizQuestions = [];
+
+        // DOM-Elemente
+        const screensaverOverlay = document.getElementById('screensaver-overlay');
+        const screensaverImage = document.getElementById('screensaver-image');
+        const questionDisplay = document.getElementById('question-text');
+        const answerOptionsContainer = document.getElementById('answer-options');
+        const phoneJokerButton = document.getElementById('phone-joker-button');
+        const helpJokerButton = document.getElementById('audience-joker-button'); 
+        
+        // Referenzen für die Joker-Modals (media-joker-modal ist neu)
+        const mediaJokerModal = document.getElementById('media-joker-modal');
+        const jokerAudioElement = document.getElementById('joker-audio-element');
+        const jokerVideoElement = document.getElementById('joker-video-element'); // NEU
+        const mediaHintText = document.getElementById('media-hint'); // NEU
+        const hintJokerModal = document.getElementById('hint-joker-modal');
+        const hintContent = document.getElementById('hint-content');
+        
+        const statusListContainer = document.getElementById('status-list');
+        const quizContainer = document.getElementById('quiz-container');
+        const startScreen = document.getElementById('start-screen');
+        const endScreen = document.getElementById('end-screen');
+        const endMessage = document.getElementById('end-message');
+        
+        // --- Screensaver/Timer Logik ---
+        
+        function showStartScreen() {
+            // Verstecke alle anderen Hauptansichten
+            quizContainer.style.display = 'none';
+            endScreen.style.display = 'none';
+            closeHintModal(); 
+            closeMediaModal(); // MODIFIZIERT
+            
+            // Verstecke den Screensaver sofort
+            screensaverOverlay.classList.add('hidden');
+            screensaverOverlay.style.display = 'none';
+            
+            // Zeige Startbildschirm
+            startScreen.style.display = 'flex'; 
+            
+            resetScreensaverTimer(); 
+        }
+
+        function showScreensaver() {
+            // Verstecke alle anderen Hauptansichten
+            startScreen.style.display = 'none';
+            quizContainer.style.display = 'none';
+            endScreen.style.display = 'none';
+            closeHintModal(); 
+            closeMediaModal(); // MODIFIZIERT
+
+            // Zeige den Bildschirmschoner
+            screensaverOverlay.classList.remove('hidden');
+            screensaverOverlay.style.display = 'flex';
+        }
+
+        
+        function resetScreensaverTimer() {
+            clearTimeout(screensaverTimeout);
+            
+            // Starte den Timer nur, wenn das Quiz, der Startbildschirm oder der Endbildschirm sichtbar ist
+            if (startScreen.style.display === 'flex' || quizContainer.style.display === 'flex' || endScreen.style.display === 'flex') {
+                screensaverTimeout = setTimeout(showScreensaver, SCREENSAVER_TIMEOUT_MS);
+            }
+        }
+        
+        function setupScreensaver() {
+            // Setze das Bild für den Screensaver
+            screensaverImage.src = SCREENSAVER_IMAGE_URL;
+            
+            // Zeige den Screensaver am Anfang
+            showScreensaver(); 
+            
+            // Klick auf Screensaver führt direkt zum Startscreen
+            screensaverOverlay.addEventListener('click', showStartScreen);
+            
+            // Füge Event Listener zum gesamten Body hinzu, um den Timer zurückzusetzen, 
+            document.body.addEventListener('click', resetScreensaverTimer);
+            document.body.addEventListener('touchstart', resetScreensaverTimer);
+        }
+
+        // --- Allgemeine Hilfsfunktionen ---
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        function getQuizQuestions() {
+            // Wähle 10 zufällige Fragen aus quizData
+            const shuffled = [...quizData];
+            shuffleArray(shuffled);
+            
+            // Stelle sicher, dass Fragen 1, 2 und 5 enthalten sind, falls sie in den ersten 10 sein sollen
+            // Da wir 10 Fragen wollen, überspringen wir das manuelle Einfügen hier und lassen die Shuffle-Logik entscheiden,
+            // welche Fragen es in das aktuelle Spiel schaffen (es sind 19 Fragen insgesamt).
+            
+            // Wähle die ersten 10 Fragen
+            currentQuizQuestions = shuffled.slice(0, totalQuestions);
+
+            // OPTIONAL: Wenn die Fragen mit Joker unbedingt enthalten sein MÜSSEN,
+            // müsste man die Logik anpassen, um die 10 Fragen zu fixieren und den Rest zu shufflen.
+            // Im Moment verwenden wir einfach die ersten 10 aus dem Shuffle.
+
+            // Setze den Index zurück
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0;
+            
+            // Joker zurücksetzen
+            phoneJokerUsed = false;
+            helpJokerUsed = false;
+        }
+
+        // --- Spielsteuerung ---
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            quizContainer.style.display = 'flex';
+            
+            getQuizQuestions(); // Lädt neue, zufällige Fragen
+            updateStatusList();
+            
+            // Joker-Buttons aktivieren und zurücksetzen
+            phoneJokerButton.disabled = false;
+            helpJokerButton.disabled = false;
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= totalQuestions) {
+                showEndScreen(true);
+                return;
+            }
+
+            const currentQuestion = currentQuizQuestions[currentQuestionIndex];
+            
+            // Aktualisiere Statusleiste, um die aktive Frage hervorzuheben
+            updateStatusList(); 
+
+            // Frage anzeigen
+            questionDisplay.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+            answerOptionsContainer.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            const shuffledOptions = [...currentQuestion.answerOptions];
+            shuffleArray(shuffledOptions);
+
+            shuffledOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-button';
+                button.setAttribute('data-index', index);
+                button.setAttribute('data-correct', option.isCorrect);
+                button.innerHTML = `
+                    <div class="answer-content">
+                        <span class="answer-label">${letters[index]}:</span> 
+                        <span>${option.text}</span>
+                    </div>`;
+                
+                button.onclick = () => checkAnswer(button, option.isCorrect);
+                answerOptionsContainer.appendChild(button);
+            });
+            
+            // Joker-Buttons aktualisieren (Deaktiviert, wenn bereits benutzt)
+            phoneJokerButton.disabled = phoneJokerUsed || !PHONE_JOKER_ACTIVE_IDS.includes(currentQuestion.id);
+            helpJokerButton.disabled = helpJokerUsed || !JOKER_HINTS.hasOwnProperty(currentQuestion.id);
+        }
+
+        function checkAnswer(selectedButton, isCorrect) {
+            // Alle Buttons deaktivieren
+            const buttons = answerOptionsContainer.querySelectorAll('.answer-button');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            // Joker-Buttons deaktivieren, um weitere Nutzung zu verhindern
+            phoneJokerButton.disabled = true;
+            helpJokerButton.disabled = true;
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct');
+                correctAnswersCount++;
+                
+                // Kurze Verzögerung vor der nächsten Frage
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }, 1500); 
+                
+            } else {
+                selectedButton.classList.add('incorrect');
+                
+                // Korrekte Antwort hervorheben
+                buttons.forEach(btn => {
+                    if (btn.getAttribute('data-correct') === 'true') {
+                        btn.classList.add('correct');
+                    }
+                });
+                
+                // Kurze Verzögerung vor dem Ende
+                setTimeout(() => {
+                    showEndScreen(false);
+                }, 3000); 
+            }
+        }
+
+        function showEndScreen(won) {
+            quizContainer.style.display = 'none';
+            startScreen.style.display = 'none';
+            endScreen.style.display = 'flex';
+            
+            let message = "";
+            let finalStatus = "";
+
+            if (won) {
+                finalStatus = "Herzlichen Glückwunsch! Sie haben alle 10 Grundrechte freigeschaltet und sind ein echter Grundgesetz-Kenner!";
+            } else {
+                finalStatus = `Leider falsch! Sie haben ${correctAnswersCount} von ${totalQuestions} Fragen richtig beantwortet und ${correctAnswersCount} Grundrechte freigeschaltet. Beim nächsten Mal klappt es!`;
+            }
+            
+            endMessage.textContent = finalStatus;
+            resetScreensaverTimer();
+        }
+
+        function updateStatusList() {
+            statusListContainer.innerHTML = '';
+            
+            grundrechteStatus.forEach((rechte, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'status-item';
+                
+                // Aktiv bis zur aktuellen (richtig beantworteten) Frage
+                if (index < correctAnswersCount) {
+                    listItem.classList.add('correct');
+                    listItem.innerHTML = `<span>${index + 1}. ${rechte}</span> <i class="fas fa-check-circle" style="color: #00ff00;"></i>`;
+                } 
+                // Aktuelle Frage/Recht (wird erst aktiv, wenn richtig beantwortet)
+                else if (index === correctAnswersCount && correctAnswersCount < totalQuestions) {
+                    listItem.classList.add('active');
+                    listItem.innerHTML = `<span>${index + 1}. ${rechte}</span>`;
+                }
+                // Noch ausstehende Rechte
+                else {
+                    listItem.innerHTML = `<span>${index + 1}. ${rechte}</span>`;
+                }
+                
+                statusListContainer.appendChild(listItem);
+            });
+        }
+        
+        // --- Joker-Logik ---
+
+        // MODIFIZIERT: Funktion zum Schließen des Medien-Modals
+        function closeMediaModal() {
+            // Stoppe Audio/Video und setze die Zeit zurück
+            jokerAudioElement.pause();
+            jokerAudioElement.currentTime = 0;
+            jokerVideoElement.pause();
+            jokerVideoElement.currentTime = 0;
+
+            // Verstecke beide Medienelemente
+            jokerAudioElement.style.display = 'none';
+            jokerVideoElement.style.display = 'none';
+
+            mediaJokerModal.style.display = 'none';
+        }
+
+        // NEU: Funktion zum Verwenden des Telefonjokers
+        function usePhoneJoker() {
+            if (phoneJokerUsed) return;
+            
+            const currentQuestionId = currentQuizQuestions[currentQuestionIndex].id;
+            const mediaData = PHONE_JOKER_MEDIA[currentQuestionId];
+
+            if (!mediaData) {
+                // Sollte nicht passieren, wenn der Button richtig deaktiviert wurde
+                alert("Keine Medienressource für diesen Telefonjoker verfügbar.");
+                return;
+            }
+
+            phoneJokerUsed = true;
+            phoneJokerButton.disabled = true; // Deaktiviere dauerhaft
+
+            mediaJokerModal.style.display = 'flex';
+            
+            // Setze Titel/Hinweis
+            document.querySelector('#media-joker-modal h2').textContent = '📞 Telefonjoker: Archiv-Ausschnitt';
+            mediaHintText.textContent = 'Bitte setzen Sie die Ohrmuschel auf, um den historischen Ausschnitt zu starten.';
+            
+            // Lade die entsprechende Mediendatei
+            if (mediaData.type === 'audio') {
+                jokerVideoElement.style.display = 'none';
+                jokerAudioElement.src = mediaData.src;
+                jokerAudioElement.style.display = 'block';
+                jokerAudioElement.load(); // Lädt das Audio
+            } else if (mediaData.type === 'video') {
+                jokerAudioElement.style.display = 'none';
+                jokerVideoElement.src = mediaData.src;
+                jokerVideoElement.style.display = 'block';
+                jokerVideoElement.load(); // Lädt das Video
+            }
+            
+            resetScreensaverTimer();
+        }
+
+        // UNVERÄNDERT: Schließen des Hilfe-Modals
+        function closeHintModal() {
+            hintJokerModal.style.display = 'none';
+        }
+
+        // UNVERÄNDERT: Funktion zum Verwenden des Hilfe-Jokers
+        function useHelpJoker() {
+            if (helpJokerUsed) return;
+            
+            const currentQuestionId = currentQuizQuestions[currentQuestionIndex].id;
+            const hint = JOKER_HINTS[currentQuestionId];
+            
+            if (!hint) return; // Sollte nicht passieren, wenn Button deaktiviert ist
+
+            helpJokerUsed = true;
+            helpJokerButton.disabled = true; // Deaktiviere dauerhaft
+
+            hintContent.innerHTML = hint;
+            hintJokerModal.style.display = 'flex';
+            resetScreensaverTimer();
+        }
+
+        
+    </script>
+</body>
+</html>
