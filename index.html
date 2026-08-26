@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Meine Lernspiele</title>
+    <title>Meine Stationen</title>
 
     <style>
         /* =========================================
@@ -23,10 +23,10 @@
             --secondary: #06b6d4;
             --background: #f5f7fb;
             --card: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --text: #000000;
+            --muted: #1a1a1a;
+            --border: #d1d5db;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
         }
 
         body {
@@ -45,133 +45,165 @@
                 ),
                 var(--background);
 
-            color: var(--text);
+            color: #1f2937;
             min-height: 100vh;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
 
         /* =========================================
-           HEADER / HERO
+           HEADER / HERO (KOMPAKT)
         ========================================= */
 
         header {
-            padding: 70px 20px 55px;
+            padding: 30px 20px 25px;
             text-align: center;
         }
 
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            width: 72px;
-            height: 72px;
-
-            border-radius: 20px;
-
-            background: linear-gradient(
-                135deg,
-                var(--primary),
-                var(--secondary)
-            );
-
-            color: white;
-            font-size: 34px;
-
-            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.3);
-
-            margin-bottom: 25px;
-        }
-
         header h1 {
-            font-size: clamp(2.2rem, 5vw, 4rem);
+            font-size: clamp(1.6rem, 3.5vw, 2.8rem);
             font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            color: #111827;
         }
 
         header h1 span {
             color: var(--primary);
         }
 
-        header p {
-            max-width: 680px;
-            margin: 0 auto;
+        header h2 {
+            font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
 
-            color: var(--muted);
-            font-size: 1.1rem;
+        /* Container für das Bild mit den Texten & Logos links/rechts */
+        .header-image-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 12px auto;
+            max-width: 800px;
+        }
+
+        .header-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-image-container img.main-portrait {
+            max-width: 120px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .partner-logo {
+            max-height: 40px;
+            max-width: 140px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .header-image-text {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        header p {
+            max-width: 600px;
+            margin: 10px auto 0;
+            color: #4b5563;
+            font-size: 0.95rem;
         }
 
 
         /* =========================================
-           SPIELE-BEREICH
+           STATIONEN-BEREICH
         ========================================= */
 
         main {
             width: min(1200px, 92%);
-            margin: 0 auto 70px;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .section-title h2 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-
-        .section-title p {
-            color: var(--muted);
+            margin: 0 auto 50px;
         }
 
 
         /* =========================================
-           SPIEL-KARTEN
+           STATIONEN-KARTEN
         ========================================= */
 
         .games-grid {
             display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(280px, 1fr));
-
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .game-card {
             position: relative;
-
-            background: var(--card);
-
+            background-color: var(--card);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             border: 1px solid var(--border);
-
-            border-radius: 22px;
-
-            padding: 30px;
-
+            border-radius: 20px;
+            padding: 24px;
             box-shadow: var(--shadow);
-
-            transition:
-                transform 0.25s ease,
-                box-shadow 0.25s ease;
-
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* 
+           HINTERGRUNDBILDER FÜR DIE 5 KACHELN
+        */
+        
+        .game-card.station-1 {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.86)), 
+                url("https://raw.githubusercontent.com/taichach/Helene-Weber/main/spiel1/aufstieg_durch_bildung.jpg");
+        }
+
+        .game-card.station-2 {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.86)), 
+                url("https://raw.githubusercontent.com/taichach/Helene-Weber/main/spiel2/startbildschirm.jpg");
+        }
+
+        .game-card.station-3 {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.86)), 
+                url("https://raw.githubusercontent.com/taichach/Helene-Weber/main/spiel3/frauenbewegung.jpg");
+        }
+
+        .game-card.station-4 {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.86)), 
+                url("https://raw.githubusercontent.com/taichach/Helene-Weber/main/spiel4/muetter_des_grundgesetzes.jpg");
+        }
+
+        .game-card.station-5 {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.86)), 
+                url("https://raw.githubusercontent.com/taichach/Helene-Weber/main/spiel5/startbildschirm.jpg");
         }
 
         .game-card::before {
             content: "";
-
             position: absolute;
-
             top: 0;
             left: 0;
             right: 0;
-
             height: 5px;
-
             background: linear-gradient(
                 90deg,
                 var(--primary),
@@ -180,54 +212,52 @@
         }
 
         .game-card:hover {
-            transform: translateY(-7px);
-
-            box-shadow:
-                0 18px 45px rgba(0, 0, 0, 0.13);
+            transform: translateY(-5px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
         }
 
 
         /* =========================================
-           SPIEL-NUMMER
+           STATIONEN-NUMMER
         ========================================= */
 
         .game-number {
-            width: 48px;
-            height: 48px;
-
+            width: 42px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            border-radius: 14px;
-
-            background: #eef2ff;
-
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
             color: var(--primary);
-
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 800;
-
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
 
         /* =========================================
-           SPIEL-TEXT
+           STATIONEN-TEXT
         ========================================= */
 
         .game-card h3 {
-            font-size: 1.35rem;
-            margin-bottom: 10px;
+            font-size: 1.25rem;
+            line-height: 1.35;
+            margin-bottom: 8px;
+            color: #000000;
+            font-weight: 800;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 255, 255, 0.9);
         }
 
         .game-card p {
-            color: var(--muted);
-            font-size: 0.95rem;
-
-            min-height: 75px;
-
-            margin-bottom: 25px;
+            color: #111827;
+            font-size: 0.92rem;
+            min-height: 65px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.45;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 255, 255, 0.9);
         }
 
 
@@ -240,27 +270,20 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-
             width: 100%;
-
-            padding: 13px 18px;
-
-            border-radius: 12px;
-
+            padding: 11px 16px;
+            border-radius: 10px;
             background: var(--primary);
             color: white;
-
             text-decoration: none;
-
             font-weight: 700;
-
-            transition:
-                background 0.2s ease,
-                transform 0.2s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .play-button:hover {
             background: var(--primary-dark);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
         }
 
         .play-button:active {
@@ -268,7 +291,7 @@
         }
 
         .play-icon {
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
 
@@ -278,14 +301,21 @@
 
         footer {
             text-align: center;
-
-            padding: 30px 20px;
-
+            padding: 20px 20px;
             border-top: 1px solid var(--border);
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
 
-            color: var(--muted);
+        footer a {
+            color: #6b7280;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
 
-            font-size: 0.9rem;
+        footer a:hover {
+            color: var(--primary);
+            text-decoration: underline;
         }
 
 
@@ -294,18 +324,26 @@
         ========================================= */
 
         @media (max-width: 600px) {
-
             header {
-                padding-top: 45px;
-                padding-bottom: 40px;
+                padding-top: 20px;
+                padding-bottom: 20px;
             }
 
             .game-card {
-                padding: 25px;
+                padding: 20px;
             }
 
             header p {
-                font-size: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .header-image-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .header-image-container img.main-portrait {
+                max-width: 90px;
             }
         }
 
@@ -317,29 +355,14 @@
         .game-card {
             opacity: 0;
             transform: translateY(20px);
-
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .game-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .game-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .game-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .game-card:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        .game-card:nth-child(5) {
-            animation-delay: 0.5s;
-        }
+        .game-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-card:nth-child(4) { animation-delay: 0.4s; }
+        .game-card:nth-child(5) { animation-delay: 0.5s; }
 
         @keyframes fadeInUp {
             to {
@@ -354,21 +377,35 @@
 <body>
 
     <!-- =========================================
-         HEADER
+         HEADER (KOMPAKT MIT LOGOS)
     ========================================== -->
 
     <header>
 
-        <div class="logo">
-            🎓
+        <h1>100 Jahre Helene-Weber-Berufskolleg Paderborn</h1>
+        <h2>Digitale Ausstellung zu Helene Weber</h2>
+
+        <div class="header-image-container">
+            
+            <!-- Links: Berufskolleg Text + Logo -->
+            <div class="header-column">
+                <span class="header-image-text">Helene-Weber-Berufskolleg</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/HWBK_Logo.png" alt="HWBK Logo" class="partner-logo">
+            </div>
+
+            <!-- Mitte: Portrait Helene Weber -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/dc/1931_Helene_Weber.jpg" alt="Helene Weber" class="main-portrait">
+
+            <!-- Rechts: Uni Paderborn Text + Logo -->
+            <div class="header-column">
+                <span class="header-image-text">Universität Paderborn</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/UPB_Logo_DE_vierfarbig_CMYK.jpg" alt="Universität Paderborn Logo" class="partner-logo">
+            </div>
+
         </div>
 
-        <h1>
-            Meine <span>Lernspiele</span>
-        </h1>
-
         <p>
-            Wähle eines der fünf Mini-Lernspiele aus und
+            Wähle eine der fünf Stationen der Dauerausstellung aus und
             starte direkt mit dem Lernen.
         </p>
 
@@ -381,170 +418,106 @@
 
     <main>
 
-        <div class="section-title">
-
-            <h2>
-                Lernspiele auswählen
-            </h2>
-
-            <p>
-                Klicke auf ein Spiel, um es zu starten.
-            </p>
-
-        </div>
-
-
         <div class="games-grid">
 
 
             <!-- =====================================
-                 SPIEL 1
+                 STATION 1
             ====================================== -->
 
-            <article class="game-card">
-
-                <div class="game-number">
-                    01
+            <article class="game-card station-1">
+                <div>
+                    <div class="game-number">01</div>
+                    <h3>Bildung als Schlüssel gesellschaftlichen Aufstiegs</h3>
+                    <p>
+                        Erlebe in einem Escape-Room die Lebensstationen Helene Webers und entdecke ihren Bildungsweg.
+                    </p>
                 </div>
 
-                <h3>
-                    Lernspiel 1
-                </h3>
-
-                <p>
-                    Kurze Beschreibung deines ersten
-                    Lernspiels. Hier kannst du erklären,
-                    was die Lernenden erwartet.
-                </p>
-
-                <a
-                    class="play-button"
-                    href="spiel1/index.html"
-                >
+                <a class="play-button" href="spiel1/index.html">
                     <span class="play-icon">▶</span>
-                    Spiel starten
+                    Station starten
                 </a>
-
             </article>
 
 
             <!-- =====================================
-                 SPIEL 2
+                 STATION 2
             ====================================== -->
 
-            <article class="game-card">
-
-                <div class="game-number">
-                    02
+            <article class="game-card station-2">
+                <div>
+                    <div class="game-number">02</div>
+                    <h3>In dunklen Zeiten Entscheidungen treffen</h3>
+                    <p>
+                        Versetze dich in Helene Weber und triff Entscheidungen in der Zeit des Nationalsozialismus.
+                    </p>
                 </div>
 
-                <h3>
-                    Lernspiel 2
-                </h3>
-
-                <p>
-                    Kurze Beschreibung deines zweiten
-                    Lernspiels und des Lernziels.
-                </p>
-
-                <a
-                    class="play-button"
-                    href="spiel2/index.html"
-                >
+                <a class="play-button" href="spiel2/index.html">
                     <span class="play-icon">▶</span>
-                    Spiel starten
+                    Station starten
                 </a>
-
             </article>
 
 
             <!-- =====================================
-                 SPIEL 3
+                 STATION 3
             ====================================== -->
 
-            <article class="game-card">
-
-                <div class="game-number">
-                    03
+            <article class="game-card station-3">
+                <div>
+                    <div class="game-number">03</div>
+                    <h3>Gleichberechtigung? Von Webers Vision zur Wirklichkeit</h3>
+                    <p>
+                        Vergleiche Helene Webers Visionen der Gleichberechtigung mit der heutigen Realität.
+                    </p>
                 </div>
 
-                <h3>
-                    Lernspiel 3
-                </h3>
-
-                <p>
-                    Kurze Beschreibung deines dritten
-                    Lernspiels.
-                </p>
-
-                <a
-                    class="play-button"
-                    href="spiel3/index.html"
-                >
+                <a class="play-button" href="spiel3/index.html">
                     <span class="play-icon">▶</span>
-                    Spiel starten
+                    Station starten
                 </a>
-
             </article>
 
 
             <!-- =====================================
-                 SPIEL 4
+                 STATION 4
             ====================================== -->
 
-            <article class="game-card">
-
-                <div class="game-number">
-                    04
+            <article class="game-card station-4">
+                <div>
+                    <div class="game-number">04</div>
+                    <h3>Wer wird Millionär? Grundgesetz-Edition</h3>
+                    <p>
+                        Teste dein Wissen rund um das Grundgesetz im Stil der beliebten Quizshow.
+                    </p>
                 </div>
 
-                <h3>
-                    Lernspiel 4
-                </h3>
-
-                <p>
-                    Kurze Beschreibung deines vierten
-                    Lernspiels.
-                </p>
-
-                <a
-                    class="play-button"
-                    href="spiel4/index.html"
-                >
+                <a class="play-button" href="spiel4/index.html">
                     <span class="play-icon">▶</span>
-                    Spiel starten
+                    Station starten
                 </a>
-
             </article>
 
 
             <!-- =====================================
-                 SPIEL 5
+                 STATION 5
             ====================================== -->
 
-            <article class="game-card">
-
-                <div class="game-number">
-                    05
+            <article class="game-card station-5">
+                <div>
+                    <div class="game-number">05</div>
+                    <h3>Orte, die Helene Webers Namen tragen</h3>
+                    <p>
+                        Verorte im GeoGuessr-Stil Orte in Deutschland, die an Helene Webers Wirken erinnern.
+                    </p>
                 </div>
 
-                <h3>
-                    Lernspiel 5
-                </h3>
-
-                <p>
-                    Kurze Beschreibung deines fünften
-                    Lernspiels.
-                </p>
-
-                <a
-                    class="play-button"
-                    href="spiel5/index.html"
-                >
+                <a class="play-button" href="spiel5/index.html">
                     <span class="play-icon">▶</span>
-                    Spiel starten
+                    Station starten
                 </a>
-
             </article>
 
 
@@ -560,7 +533,7 @@
     <footer>
 
         <p>
-            © 2026 – Meine Lernspiele
+            © 2026 – <a href="https://www.uni-paderborn.de/impressum" target="_blank" rel="noopener noreferrer">Impressum</a> | <a href="https://www.uni-paderborn.de/universitaet/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a>
         </p>
 
     </footer>
@@ -572,41 +545,17 @@
 
     <script>
 
-        // ------------------------------------------------
-        // Kleine Begrüßung beim Laden der Seite
-        // ------------------------------------------------
-
         document.addEventListener("DOMContentLoaded", function () {
-
-            console.log(
-                "Lernspiel-Übersicht erfolgreich geladen."
-            );
-
+            console.log("Stationen-Übersicht erfolgreich geladen.");
         });
 
-
-        // ------------------------------------------------
-        // Verhindert einen Klick auf nicht vorhandene
-        // Links und zeigt eine verständliche Meldung.
-        // ------------------------------------------------
-
-        const buttons =
-            document.querySelectorAll(".play-button");
+        const buttons = document.querySelectorAll(".play-button");
 
         buttons.forEach(function (button) {
-
             button.addEventListener("click", function (event) {
-
-                const target =
-                    button.getAttribute("href");
-
-                console.log(
-                    "Lernspiel wird geöffnet:",
-                    target
-                );
-
+                const target = button.getAttribute("href");
+                console.log("Station wird geöffnet:", target);
             });
-
         });
 
     </script>
