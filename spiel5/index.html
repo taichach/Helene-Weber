@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-    <title>Erinnerung hat viele Adressen - Orte, die Helene Webers Namen tragen</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./leaflet/leaflet.css" /> 
+    <title>Erinnerung hat viele Adressen - Orte, die Helene Webers Namen tragen</title>
+    
+    <!-- Online Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -13,14 +16,15 @@
             margin: 0;
             padding: 20px;
         }
-        /* --- NEUE STYLES FÜR SPLASH & INTRO SCREENS --- */
+
+        /* --- OVERLAYS (Splash & Intro) --- */
         .full-screen-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2000; /* Höher als alle anderen Elemente */
+            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -35,25 +39,23 @@
             cursor: pointer;
         }
 
-        /* NEUE KEYFRAMES FÜR DIE PULSIERENDE ANIMATION */
         @keyframes pulse {
-            0% { opacity: 0.8; }
+            0%, 100% { opacity: 0.8; }
             50% { opacity: 1.0; }
-            100% { opacity: 0.8; }
         }
 
         #splash-message {
             position: absolute;
-            top: 15%; /* Nach oben verschoben */
-            font-size: 2.5em; /* Etwas größer gemacht für mehr Prominenz */
+            top: 15%;
+            font-size: 2.5em;
             font-weight: bold;
-            color: yellow; /* Gelb wie gewünscht */
-            text-shadow: 0 0 15px rgba(0, 0, 0, 1); /* Stärkerer Schatten */
-            animation: pulse 2s infinite alternate; /* Pulsierende Animation hinzugefügt */
+            color: yellow;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 1);
+            animation: pulse 2s infinite alternate;
         }
 
         #intro-screen {
-            background-color: rgba(169, 50, 38, 0.95); /* Leicht transparentes Helene Weber Rot */
+            background-color: rgba(169, 50, 38, 0.95);
             flex-direction: column;
             padding: 20px;
         }
@@ -72,20 +74,10 @@
             margin: 15px auto;
             line-height: 1.6;
         }
-        
-        #intro-screen button {
-            background-color: #2ECC71; /* Grüner Start-Button */
-            margin-top: 30px;
-            padding: 15px 30px;
-            font-size: 1.5em;
-        }
-        
-        #intro-screen button:hover {
-            background-color: #27AE60; 
-        }
 
+        /* --- GAME CONTAINER & LAYOUT --- */
         #game-container {
-            display: none; /* Versteckt, bis das Spiel gestartet wird */
+            display: none;
             max-width: 1400px;
             margin: 0 auto;
             background: #fff;
@@ -93,35 +85,38 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        
-        /* --- BESTEHENDE STYLES --- */
+
         #info-panel {
             width: 30%;
             padding: 30px;
-            background-color: #A93226; 
+            background-color: #A93226;
             color: white;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
+
         #map-container {
             width: 70%;
-            position: relative; 
+            position: relative;
         }
+
         #map {
             height: 800px;
         }
-        /* ÜBERSCHRIFTEN */
+
         h1, h2, h3 {
             border-bottom: 2px solid rgba(255, 255, 255, 0.3);
             padding-bottom: 10px;
             margin-top: 0;
         }
-        /* Container für Slider/Bild */
-        #task-view-container { 
+
+        /* --- TASK SLIDER / BILDER --- */
+        #task-view-container {
             margin-bottom: 15px;
-            position: relative; 
+            position: relative;
         }
+
         #task-view-container img {
             max-width: 100%;
             height: auto;
@@ -129,7 +124,7 @@
             border: 3px solid #fff;
             display: block;
         }
-        /* Style für den Slider */
+
         .slider-controls {
             position: absolute;
             top: 50%;
@@ -138,30 +133,33 @@
             display: flex;
             justify-content: space-between;
             padding: 0 5px;
+            box-sizing: border-box;
         }
+
         .slider-controls button {
             background: rgba(0, 0, 0, 0.5);
             border: none;
             color: white;
             padding: 5px 10px;
             cursor: pointer;
-            margin: 0;
-            margin-top: 0 !important; 
+            margin: 0 !important;
             border-radius: 50%;
             font-size: 1.2em;
             line-height: 1;
             transition: background 0.2s;
         }
+
         .slider-controls button:hover {
             background: rgba(0, 0, 0, 0.8);
         }
 
-        #score-board p, #round-info p {
+        #round-info p {
             margin: 5px 0;
             font-size: 1.1em;
         }
+
         button {
-            background-color: #E74C3C; 
+            background-color: #E74C3C;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -171,92 +169,70 @@
             margin-top: 20px;
             transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #C0392B;
-        }
-        #feedback {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            background: #fff;
-            color: #A93226;
-            font-weight: bold;
-            display: none;
-        }
+
+        button:hover { background-color: #C0392B; }
+        .btn-start { background-color: #2ECC71; font-size: 1.5em; padding: 15px 30px; }
+        .btn-start:hover { background-color: #27AE60; }
+        .btn-confirm { background-color: #2ECC71; }
+        .btn-cancel { background-color: #E74C3C; }
+
         .correct-line {
             stroke-width: 4px;
             stroke-dasharray: 5, 5;
         }
-        .score-list li {
-            list-style: none;
-            padding: 5px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
-        }
-        
-        /* Popup/Modal Styles (General) */
+
+        /* --- MODAL DIALOGE --- */
         .modal {
-            display: none; 
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             background-color: rgba(0,0,0,0.4);
         }
+
         .modal-content {
             background-color: #fefefe;
-            margin: 10% auto; /* Höher zentriert, da mehr Inhalt */
+            margin: 10% auto;
             padding: 30px;
             border: 1px solid #888;
-            width: 80%; 
-            max-width: 500px; /* Etwas breiter für den Player */
+            width: 80%;
+            max-width: 500px;
             border-radius: 10px;
             text-align: center;
             color: #333;
         }
+
         .modal-content button {
             margin: 10px;
             width: 45%;
             font-size: 1.1em;
             padding: 12px;
         }
-        .btn-confirm {
-            background-color: #2ECC71; 
-        }
-        .btn-cancel {
-            background-color: #E74C3C; 
-        }
-        
-        /* Interview Modal spezifisch */
-        #interview-modal h2 {
-            color: #A93226;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-        }
+
+        #interview-modal h2 { color: #A93226; border-bottom: 2px solid #ccc; }
         #interview-modal audio {
             width: 100%;
             margin: 15px 0 10px;
-            background-color: #ddd; /* Hintergrundfarbe für bessere Sichtbarkeit des Players */
+            background-color: #ddd;
             border-radius: 5px;
         }
         #interview-modal .button-group {
-            margin-top: 20px;
             display: flex;
             justify-content: space-around;
         }
 
-
-        /* Ergebnis-Popup über der Karte (Modal 2 - z-index 900) */
-        #result-popup {
+        /* --- OVERLAY POPUPS AUF DER KARTE --- */
+        .map-popup {
             display: none;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 900; 
-            background-color: rgba(0, 0, 0, 0.85); 
+            z-index: 900;
+            background-color: rgba(0, 0, 0, 0.85);
             color: white;
             padding: 30px 40px;
             border-radius: 15px;
@@ -264,72 +240,32 @@
             text-align: center;
             max-width: 450px;
             min-width: 300px;
-            border: 4px solid #E74C3C;
-        }
-        #result-popup h2 {
-            margin-top: 0;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
-            padding-bottom: 10px;
-            font-size: 1.8em;
-        }
-        #result-popup p {
-            font-size: 1.3em;
-            margin: 10px 0;
         }
 
-        /* Endstand-Popup über der Karte (Modal 3 - z-index 900) */
-        #endgame-popup {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 900; 
-            background-color: rgba(0, 0, 0, 0.85); 
-            color: white;
-            padding: 30px 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            max-width: 450px;
-            min-width: 300px;
-            border: 4px solid #2ECC71; 
-        }
-        #endgame-popup h2 {
+        #result-popup { border: 4px solid #E74C3C; }
+        #endgame-popup { border: 4px solid #2ECC71; }
+
+        #result-popup h2, #endgame-popup h2 {
             margin-top: 0;
             border-bottom: 2px solid rgba(255, 255, 255, 0.5);
             padding-bottom: 10px;
-            font-size: 2em;
         }
+
         #endgame-score {
-             font-size: 1.6em;
-             font-weight: bold;
-             color: #2ECC71;
-             margin: 15px 0;
-        }
-        .endgame-button {
-            background-color: #E74C3C;
-            margin-top: 15px;
-            font-size: 1.1em;
-        }
-        
-        /* Highscore-Anzeige im Info-Panel entfernen */
-        #score-board {
-            display: none; 
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #2ECC71;
+            margin: 15px 0;
         }
 
-        /* Optische Hervorhebung für den Tipp-Bereich */
         #tip-area {
-            border: 2px solid #E74C3C; 
+            border: 2px solid #E74C3C;
             padding: 15px;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1); 
+            background: rgba(255, 255, 255, 0.1);
             margin-top: 20px;
         }
-        #tip-area h3 {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            padding-bottom: 5px;
-        }
+
         #current-tip {
             font-size: 1.15em;
             font-weight: bold;
@@ -338,18 +274,21 @@
 </head>
 <body>
 
+<!-- SPLASH SCREEN -->
 <div id="splash-screen" class="full-screen-overlay" onclick="showIntroScreen()">
     <div id="splash-message">Tippen Sie auf den Bildschirm, um das Spiel zu starten</div>
 </div>
 
+<!-- INTRO SCREEN -->
 <div id="intro-screen" class="full-screen-overlay" style="display: none;">
     <h2>Willkommen zum Helene-Weber-Geoguess!</h2>
     <p>Ihre Aufgabe ist es, den Ort auf der Karte zu finden, an dem sich eine Straße, ein Platz oder ein Event zu Ehren der Politikerin Helene Weber befindet.</p>
     <p>Sie erhalten ein Bild oder einen Bilder-Slider und einen kurzen Tipp. Setzen Sie den Marker so präzise wie möglich auf der Karte. Je näher Sie dem tatsächlichen Ort kommen, desto mehr Punkte erhalten Sie!</p>
     <p>Es werden 5 Runden gespielt.</p> 
-    <button onclick="startGame()">▶️ Spiel starten</button>
+    <button class="btn-start" onclick="startGame()">▶️ Spiel starten</button>
 </div>
 
+<!-- GAME CONTAINER -->
 <div id="game-container">
     <div id="info-panel">
         <div>
@@ -362,43 +301,34 @@
             
             <hr>
 
-            <div id="task-view-container">
-                </div>
+            <div id="task-view-container"></div>
 
             <div id="tip-area">
                 <h3>Tipp:</h3>
                 <p id="current-tip"></p>
             </div>
-
-            <div id="feedback"></div> 
-
-            </div>
-
-        <div id="score-board">
-            <h3>Highscore-Tabelle</h3>
-            <ol id="highscores" class="score-list">
-            </ol>
         </div>
     </div>
     
     <div id="map-container">
         <div id="map"></div>
         
-        <div id="result-popup">
+        <div id="result-popup" class="map-popup">
             <h2 id="popup-heading">Runde abgeschlossen!</h2>
             <p id="popup-distance"></p>
             <p id="popup-score"></p>
             <button id="next-button-popup">Nächste Runde starten</button>
         </div>
         
-        <div id="endgame-popup">
+        <div id="endgame-popup" class="map-popup">
             <h2>🎉 Spiel beendet! 🎉</h2>
             <p id="endgame-score"></p>
-            <button id="restart-button-popup" class="endgame-button">Neues Spiel starten</button>
+            <button id="restart-button-popup">Neues Spiel starten</button>
         </div>
     </div>
 </div>
 
+<!-- CONFIRMATION MODAL -->
 <div id="confirmation-modal" class="modal">
     <div class="modal-content">
         <h2>Schätzung bestätigen</h2>
@@ -408,6 +338,7 @@
     </div>
 </div>
 
+<!-- INTERVIEW MODAL -->
 <div id="interview-modal" class="modal">
     <div class="modal-content">
         <h2>🎧 Besonderer Fund: Interview</h2>
@@ -420,276 +351,126 @@
         <p style="font-size: 0.9em; color: #666; margin-top: 5px;">Interview mit Preisträgerin Frau Onyeka, geführt von Schülerinnen des Helene-Weber-Berufskollegs.</p>
 
         <div class="button-group">
-             <button onclick="closeInterviewModal()" class="btn-confirm">Interview gehört & raten</button>
-             <button onclick="closeInterviewModal(true)" class="btn-cancel">Interview überspringen & raten</button>
+            <button onclick="closeInterviewModal()" class="btn-confirm">Interview gehört & raten</button>
+            <button onclick="closeInterviewModal(true)" class="btn-cancel">Interview überspringen & raten</button>
         </div>
     </div>
 </div>
 
-<script src="./leaflet/leaflet.js"></script>
+<!-- Online Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-    // Globale Variablen für Slider und Timer
+    // Globale Variablen
     let currentSlideIndex = 0;
     let currentImageArray = [];
     let activityTimer;
-    const INACTIVITY_TIMEOUT = 180000; // 3 Minuten in Millisekunden
+    const INACTIVITY_TIMEOUT = 180000; // 3 Minuten
 
-    // 1. Zentrale Datenstruktur für alle Slider-Bilder
+    // 1. Bilder-Datenstruktur
     const allSliderImages = {
-        "guetersloh": [
-            "img/guetersloh1.jpg", 
-            "img/guetersloh2.jpg", 
-            "img/guetersloh3.jpg"
-        ],
-        "badmergentheim": [
-            "img/badmergentheim1.jpg", 
-            "img/badmergentheim2.jpg", 
-            "img/badmergentheim3.jpg"
-        ],
-        "bonn": [
-            "img/bonn1.jpg", 
-            "img/bonn2.jpg"
-        ],
-        "datteln": [
-            "img/datteln1.jpg", 
-            "img/datteln2.jpg", 
-            "img/datteln3.jpg"
-        ],
-        "gernsheim": [
-            "img/gernsheim1.jpg", 
-            "img/gernsheim2.jpg", 
-            "img/gernsheim3.jpg"
-        ],
-        "laatzen": [
-            "img/laatzen1.jpg", 
-            "img/laatzen2.jpg"
-        ],
-        "muenchen": [
-            "img/muenchen1.jpg", 
-            "img/muenchen2.jpg", 
-            "img/muenchen3.jpg"
-        ],
-        "norderstedt": [
-            "img/norderstedt1.jpg", 
-            "img/norderstedt2.jpg", 
-            "img/norderstedt3.jpg"
-        ],
-        "wuppertal": [
-            "img/wuppertal1.jpg", 
-            "img/wuppertal2.jpg", 
-            "img/wuppertal3.jpg", 
-            "img/wuppertal4.jpg", 
-            "img/wuppertal5.jpg"
-        ]
+        "guetersloh": ["img/guetersloh1.jpg", "img/guetersloh2.jpg", "img/guetersloh3.jpg"],
+        "badmergentheim": ["img/badmergentheim1.jpg", "img/badmergentheim2.jpg", "img/badmergentheim3.jpg"],
+        "bonn": ["img/bonn1.jpg", "img/bonn2.jpg"],
+        "datteln": ["img/datteln1.jpg", "img/datteln2.jpg", "img/datteln3.jpg"],
+        "gernsheim": ["img/gernsheim1.jpg", "img/gernsheim2.jpg", "img/gernsheim3.jpg"],
+        "laatzen": ["img/laatzen1.jpg", "img/laatzen2.jpg"],
+        "muenchen": ["img/muenchen1.jpg", "img/muenchen2.jpg", "img/muenchen3.jpg"],
+        "norderstedt": ["img/norderstedt1.jpg", "img/norderstedt2.jpg", "img/norderstedt3.jpg"],
+        "wuppertal": ["img/wuppertal1.jpg", "img/wuppertal2.jpg", "img/wuppertal3.jpg", "img/wuppertal4.jpg", "img/wuppertal5.jpg"]
     };
 
-    // 2. Datenbasis (HELENE WEBER STANDORTE)
+    // 2. Standorte
     const locations = [
-        { 
-            name: "Helene-Weber-Straße", 
-            city: "Gütersloh", 
-            lat: 51.9000, 
-            lon: 8.3833, 
-            slider_key: "guetersloh", 
-            tip: "Sitz eines großen, international bekannten Technologiekonzerns in Ostwestfalen.", 
-            difficulty: 2, 
-            embed_url: ""
-        },
-        { 
-            name: "Helene-Weber-Preis-Verleihung", 
-            city: "Göttingen", 
-            lat: 51.5333, 
-            lon: 9.9333, 
-            image: "img/goettingen1.jpg", 
-            media_key: "onyeka_interview", // <-- Schlüssel für das spezielle Modal
-            tip: "Diese Universitätsstadt in Niedersachsen ist die Heimat einer stellvertretenden Bürgermeisterin, die für ihr Engagement mit dem Helene-Weber-Preis ausgezeichnet wurde.", 
-            difficulty: 2, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Platz", 
-            city: "Wuppertal (Nordstadt)", 
-            lat: 51.2789, 
-            lon: 7.1459, 
-            slider_key: "wuppertal", 
-            tip: "Liegt in einer Stadt, die für ihre Schwebebahn berühmt ist.", 
-            difficulty: 1, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Straße", 
-            city: "Bonn (Vilich)", 
-            lat: 50.7607, 
-            lon: 7.1353, 
-            slider_key: "bonn", 
-            tip: "Die ehemalige Bundeshauptstadt am Rhein.", 
-            difficulty: 1, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Allee", 
-            city: "München (Neuhausen)", 
-            lat: 48.1467, 
-            lon: 11.5303, 
-            slider_key: "muenchen", 
-            tip: "Die bayerische Landeshauptstadt im Süden.", 
-            difficulty: 2, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Straße", 
-            city: "Norderstedt", 
-            lat: 53.7027, 
-            lon: 9.9937, 
-            slider_key: "norderstedt", 
-            tip: "Liegt nördlich von Hamburg in Schleswig-Holstein.", 
-            difficulty: 3, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Straße", 
-            city: "Laatzen", 
-            lat: 52.3023, 
-            lon: 9.8082, 
-            slider_key: "laatzen", 
-            tip: "Eine Stadt südlich von Hannover, bekannt für die Messe.", 
-            difficulty: 2, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Straße", 
-            city: "Datteln", 
-            lat: 51.6500, 
-            lon: 7.3500, 
-            slider_key: "datteln", 
-            tip: "Kanalknotenpunkt im Herzen des Ruhrgebiets.", 
-            difficulty: 3, 
-            embed_url: "" 
-        },
-        { 
-            name: "Helene-Weber-Weg", 
-            city: "Bad Mergentheim", 
-            lat: 49.4883, 
-            lon: 9.7745, 
-            slider_key: "badmergentheim", 
-            tip: "Bekannte Kurstadt in Baden-Württemberg (Main-Tauber-Kreis).", 
-            difficulty: 3, 
-            embed_url: "" 
-        },
-        { 
-            name: "Dr.-Helene-Weber-Straße", 
-            city: "Gernsheim", 
-            lat: 49.7424, 
-            lon: 8.4908, 
-            slider_key: "gernsheim", 
-            tip: "Eine Hafenstadt in Hessen (Kreis Groß-Gerau) am Rhein.", 
-            difficulty: 3, 
-            embed_url: "" 
-        },
+        { name: "Helene-Weber-Straße", city: "Gütersloh", lat: 51.9000, lon: 8.3833, slider_key: "guetersloh", tip: "Sitz eines großen, international bekannten Technologiekonzerns in Ostwestfalen." },
+        { name: "Helene-Weber-Preis-Verleihung", city: "Göttingen", lat: 51.5333, lon: 9.9333, image: "img/goettingen1.jpg", media_key: "onyeka_interview", tip: "Diese Universitätsstadt in Niedersachsen ist die Heimat einer stellvertretenden Bürgermeisterin, die für ihr Engagement mit dem Helene-Weber-Preis ausgezeichnet wurde." },
+        { name: "Helene-Weber-Platz", city: "Wuppertal (Nordstadt)", lat: 51.2789, lon: 7.1459, slider_key: "wuppertal", tip: "Liegt in einer Stadt, die für ihre Schwebebahn berühmt ist." },
+        { name: "Helene-Weber-Straße", city: "Bonn (Vilich)", lat: 50.7607, lon: 7.1353, slider_key: "bonn", tip: "Die ehemalige Bundeshauptstadt am Rhein." },
+        { name: "Helene-Weber-Allee", city: "München (Neuhausen)", lat: 48.1467, lon: 11.5303, slider_key: "muenchen", tip: "Die bayerische Landeshauptstadt im Süden." },
+        { name: "Helene-Weber-Straße", city: "Norderstedt", lat: 53.7027, lon: 9.9937, slider_key: "norderstedt", tip: "Liegt nördlich von Hamburg in Schleswig-Holstein." },
+        { name: "Helene-Weber-Straße", city: "Laatzen", lat: 52.3023, lon: 9.8082, slider_key: "laatzen", tip: "Eine Stadt südlich von Hannover, bekannt für die Messe." },
+        { name: "Helene-Weber-Straße", city: "Datteln", lat: 51.6500, lon: 7.3500, slider_key: "datteln", tip: "Kanalknotenpunkt im Herzen des Ruhrgebiets." },
+        { name: "Helene-Weber-Weg", city: "Bad Mergentheim", lat: 49.4883, lon: 9.7745, slider_key: "badmergentheim", tip: "Bekannte Kurstadt in Baden-Württemberg (Main-Tauber-Kreis)." },
+        { name: "Dr.-Helene-Weber-Straße", city: "Gernsheim", lat: 49.7424, lon: 8.4908, slider_key: "gernsheim", tip: "Eine Hafenstadt in Hessen (Kreis Groß-Gerau) am Rhein." }
     ];
 
-    // 3. Spiel-Variablen
+    // 3. Game State
     let currentRound = 0;
     const maxRounds = 5;
     let totalScore = 0;
-    let availableLocations = [...locations]; 
+    let availableLocations = [...locations];
     let targetLocation = null;
     let guessMarker = null;
 
-    // 4. Karten-Initialisierung
-    const map = L.map('map').setView([51.5, 10.0], 8); 
-    
-    // Lokale Tiles für Offline-Betrieb
-    L.tileLayer('./offline_tiles/{z}/{x}/{y}.png', {
-        minZoom: 7,         
-        maxZoom: 12,        
-        maxNativeZoom: 10, 
-        attribution: '© OpenStreetMap (Lokale Tiles)'
+    // 4. Karten-Initialisierung (ONLINE TILES)
+    const map = L.map('map').setView([51.5, 10.0], 6);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const correctIcon = L.divIcon({ className: 'helene-weber-marker', html: '<div style="background-color:#E74C3C; width:16px; height:16px; border-radius:50%; border:3px solid white;"></div>', iconSize: [22, 22], iconAnchor: [11, 11] });
-    
-    // --- NEUE FUNKTIONEN FÜR BILDSCHIRMSCHONER/START ---
+    const correctIcon = L.divIcon({
+        className: 'helene-weber-marker',
+        html: '<div style="background-color:#E74C3C; width:16px; height:16px; border-radius:50%; border:3px solid white;"></div>',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+    });
 
-    // Setzt das Spiel komplett zurück und zeigt den Splash Screen
+    // --- TIMING & NAVIGATION ---
     function resetGameAndShowSplash() {
-        console.log("Inaktivität erkannt: Spiel wird zurückgesetzt.");
         currentRound = 0;
         totalScore = 0;
         availableLocations = [...locations];
         
-        // Screens umschalten
         document.getElementById('game-container').style.display = 'none';
         document.getElementById('intro-screen').style.display = 'none';
         document.getElementById('splash-screen').style.display = 'flex';
         
-        // Marker entfernen und Karte zurücksetzen
-        if (guessMarker) map.removeLayer(guessMarker);
-        map.eachLayer(layer => {
-            if (layer.options && layer.options.className === 'correct-line' || (layer instanceof L.Marker && layer.options.icon === correctIcon)) map.removeLayer(layer);
-        });
-        map.setView([51.5, 10.0], 8); 
+        clearMapLayers();
+        map.setView([51.5, 10.0], 6);
     }
 
-    // Startet den Inaktivitäts-Timer
     function startActivityTimer() {
         clearTimeout(activityTimer);
         activityTimer = setTimeout(resetGameAndShowSplash, INACTIVITY_TIMEOUT);
     }
-    
-    // Zeigt den Anleitungsscreen an
+
     function showIntroScreen() {
         document.getElementById('splash-screen').style.display = 'none';
         document.getElementById('intro-screen').style.display = 'flex';
-        startActivityTimer(); // Timer nach Klick starten
+        startActivityTimer();
     }
-    
-    // START FUNKTION MIT KACHEL-FEHLERBEHEBUNG
+
     function startGame() {
         document.getElementById('intro-screen').style.display = 'none';
         document.getElementById('game-container').style.display = 'flex';
-        
-        // WICHTIGE FEHLERBEHEBUNG FÜR KACHELN:
-        map.invalidateSize(); 
-
+        map.invalidateSize();
         startNewGame();
-        startActivityTimer(); // Timer beim Spielstart starten
     }
 
-    // --- INTERVIEW MODAL FUNKTIONEN ---
-
+    // --- MODAL LOGIK ---
     function showInterviewModal() {
         const audioPlayer = document.getElementById('onyeka-modal-audio');
-        
-        // 1. Audio stoppen (falls noch ein alter Player lief) und auf Anfang setzen
         if (audioPlayer) {
-             audioPlayer.pause();
-             audioPlayer.currentTime = 0;
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
         }
-
-        // 2. Modal anzeigen
         document.getElementById('interview-modal').style.display = 'block';
     }
-    
-    // Schließt das Modal und lädt die Runden-Assets
+
     function closeInterviewModal(wasSkipped = false) {
-        // Audio stoppen und Modal ausblenden
         const audioPlayer = document.getElementById('onyeka-modal-audio');
         if (audioPlayer) audioPlayer.pause();
         document.getElementById('interview-modal').style.display = 'none';
-
-        // Lade die Rundendaten und zeige das Bild
         loadRoundAssets();
-        startActivityTimer(); 
+        startActivityTimer();
     }
 
-
-    // --- MEDIEN RENDERING FUNKTIONEN ---
-
+    // --- SLIDER & MEDIA ---
     function createSliderHTML(images) {
-        currentImageArray = images; 
-        currentSlideIndex = 0; 
-        
+        currentImageArray = images;
+        currentSlideIndex = 0;
         return `
             <h3>Wo bin ich? (Bilder-Slider)</h3>
             <img id="slider-img" src="${currentImageArray[currentSlideIndex]}" alt="Vorschau ${targetLocation.city}">
@@ -702,56 +483,44 @@
     }
 
     function updateSlider(direction) {
-        if (currentImageArray.length === 0) return; 
-        
-        currentSlideIndex += direction;
-        
-        if (currentSlideIndex < 0) {
-            currentSlideIndex = currentImageArray.length - 1;
-        } else if (currentSlideIndex >= currentImageArray.length) {
-            currentSlideIndex = 0;
-        }
-        
+        if (currentImageArray.length === 0) return;
+        currentSlideIndex = (currentSlideIndex + direction + currentImageArray.length) % currentImageArray.length;
         document.getElementById('slider-img').src = currentImageArray[currentSlideIndex];
-        startActivityTimer(); 
+        startActivityTimer();
     }
-    
-    // Hilfsfunktion zum Laden der Rundendaten nach der Modal-Entscheidung
+
     function loadRoundAssets() {
         const taskViewEl = document.getElementById('task-view-container');
-        let taskViewContent = '';
-
-        // Anzeige: Slider oder Einzeldarstellung
         if (targetLocation.slider_key) {
-            const sliderImages = allSliderImages[targetLocation.slider_key];
-            taskViewContent = createSliderHTML(sliderImages);
+            taskViewEl.innerHTML = createSliderHTML(allSliderImages[targetLocation.slider_key]);
         } else if (targetLocation.image) {
-             taskViewContent = `
+            taskViewEl.innerHTML = `
                 <h3>Wo bin ich? (Bild-Vorschau)</h3>
                 <img id="single-img" src="${targetLocation.image}" alt="${targetLocation.name} in ${targetLocation.city}">
-                <small style="color:white; display:block; text-align:center;">Vorschau geladen (Offline-Modus)</small>
             `;
-            currentImageArray = []; 
+            currentImageArray = [];
         }
-
-        taskViewEl.innerHTML = taskViewContent;
-        
-        // Zeige den Tipp an
         document.getElementById('current-tip').textContent = targetLocation.tip;
     }
 
-
-    // 6. Spiel-Funktionen
-    
+    // --- CORE GAME LOGIC ---
     function startNewGame() {
         currentRound = 0;
         totalScore = 0;
         availableLocations = [...locations];
         document.getElementById('total-score').textContent = 0;
-        
         document.getElementById('endgame-popup').style.display = 'none';
-        
         startNewRound();
+    }
+
+    function clearMapLayers() {
+        if (guessMarker) map.removeLayer(guessMarker);
+        guessMarker = null;
+        map.eachLayer(layer => {
+            if (layer instanceof L.Polyline || (layer instanceof L.Marker && layer.options.icon === correctIcon)) {
+                map.removeLayer(layer);
+            }
+        });
     }
 
     function startNewRound() {
@@ -759,50 +528,36 @@
             endGame();
             return;
         }
+
+        startActivityTimer();
         
-        startActivityTimer(); // Aktivität
-        
-        // Popups/Container verstecken
         document.getElementById('result-popup').style.display = 'none';
         document.getElementById('confirmation-modal').style.display = 'none';
-        document.getElementById('interview-modal').style.display = 'none'; // Immer verstecken am Rundenstart
+        document.getElementById('interview-modal').style.display = 'none';
 
         currentRound++;
         document.getElementById('current-round').textContent = currentRound;
         
-        // Karte zurücksetzen
-        if (guessMarker) map.removeLayer(guessMarker);
-        map.eachLayer(layer => {
-            if (layer.options && layer.options.className === 'correct-line' || (layer instanceof L.Marker && layer.options.icon === correctIcon)) map.removeLayer(layer);
-        });
-        map.setView([51.5, 10.0], 8); 
+        clearMapLayers();
+        map.setView([51.5, 10.0], 6);
 
-        // RUNDENLOGIK ZUFALL
         const randomIndex = Math.floor(Math.random() * availableLocations.length);
         targetLocation = availableLocations.splice(randomIndex, 1)[0];
-        
-        // Wenn es Göttingen ist (media_key gesetzt), zeige das Interview-Modal
+
         if (targetLocation.media_key === "onyeka_interview") {
-            // Tipp und Asset-Container leer lassen, bis die Entscheidung getroffen wurde
             document.getElementById('current-tip').textContent = 'Treffen Sie eine Auswahl...';
-            document.getElementById('task-view-container').innerHTML = ''; 
+            document.getElementById('task-view-container').innerHTML = '';
             showInterviewModal();
         } else {
-            // Normale Runde: Tipp laden und Assets sofort anzeigen
-            loadRoundAssets(); 
+            loadRoundAssets();
         }
     }
 
-    // Diese Funktion setzt den Marker und zeigt sofort das Bestätigungs-Popup
     function handleMapClick(e) {
-        startActivityTimer(); // Aktivität
-        
-        // Prüfen, ob irgendein Modal aktiv ist
-        if (document.getElementById('result-popup').style.display === 'block' || document.getElementById('endgame-popup').style.display === 'block' || document.getElementById('confirmation-modal').style.display === 'block' || document.getElementById('interview-modal').style.display === 'block') return; 
+        startActivityTimer();
+        if (isAnyModalOpen()) return;
 
-        if (guessMarker) {
-            map.removeLayer(guessMarker);
-        }
+        if (guessMarker) map.removeLayer(guessMarker);
 
         guessMarker = L.circleMarker(e.latlng, {
             radius: 8,
@@ -811,43 +566,31 @@
             fillOpacity: 0.8
         }).addTo(map);
 
-        map.setView(e.latlng, map.getZoom()); 
-        
-        showConfirmation();
-    }
-
-    // Zeigt das Bestätigungs-Popup
-    function showConfirmation() {
-        startActivityTimer(); // Aktivität
-        if (!guessMarker) return;
         document.getElementById('confirmation-modal').style.display = 'block';
     }
 
-    // Schließt das Popup, entfernt den Marker und setzt Spiel zurück
+    function isAnyModalOpen() {
+        return ['result-popup', 'endgame-popup', 'confirmation-modal', 'interview-modal']
+            .some(id => document.getElementById(id).style.display === 'block');
+    }
+
     function cancelGuess() {
         document.getElementById('confirmation-modal').style.display = 'none';
         if (guessMarker) {
             map.removeLayer(guessMarker);
-            guessMarker = null; 
+            guessMarker = null;
         }
-        startActivityTimer(); // Aktivität
+        startActivityTimer();
     }
 
-    // Führt die Schätzung nach Bestätigung durch
     function confirmGuess() {
         document.getElementById('confirmation-modal').style.display = 'none';
         makeGuess();
-        startActivityTimer(); // Aktivität
     }
 
-    // Führt die Schätzung durch und zeigt das Ergebnis-Popup an
     function makeGuess() {
-        startActivityTimer(); // Aktivität
+        startActivityTimer();
         if (!guessMarker) return;
-        
-        // Audio Player pausieren/verstecken, falls er lief
-        const audioPlayer = document.getElementById('onyeka-modal-audio');
-        if (audioPlayer) audioPlayer.pause();
 
         const guessLat = guessMarker.getLatLng().lat;
         const guessLon = guessMarker.getLatLng().lng;
@@ -859,86 +602,69 @@
             .bindPopup(`<strong>Richtig:</strong> ${targetLocation.name} in ${targetLocation.city}`)
             .openPopup();
 
-        const line = L.polyline([[guessLat, guessLon], [targetLat, targetLon]], { 
-            color: '#E74C3C', 
-            className: 'correct-line' 
+        const line = L.polyline([[guessLat, guessLon], [targetLat, targetLon]], {
+            color: '#E74C3C',
+            className: 'correct-line'
         }).addTo(map);
 
         map.fitBounds(line.getBounds(), { padding: [50, 50] });
 
         const distanceKm = calculateDistance(guessLat, guessLon, targetLat, targetLon);
-
         const maxScore = 1000;
-        const maxDistance = 500; 
+        const maxDistance = 500;
         let score = 0;
 
-        if (distanceKm < 50) { 
+        if (distanceKm < 50) {
             score = maxScore;
-        } else if (distanceKm < maxDistance) { 
+        } else if (distanceKm < maxDistance) {
             score = Math.round(maxScore * (1 - (distanceKm / maxDistance)));
-        } else { 
-            score = 0;
         }
 
         totalScore += score;
         document.getElementById('total-score').textContent = totalScore;
 
-        // Ergebnis-Informationen in das Popup schreiben und anzeigen
         document.getElementById('popup-heading').textContent = `Ergebnis: ${targetLocation.city}`;
         document.getElementById('popup-distance').innerHTML = `Distanz zum Ziel: <strong>${distanceKm.toFixed(1)} km</strong>`;
         document.getElementById('popup-score').innerHTML = `Punkte in dieser Runde: <strong>${score}</strong>`;
         document.getElementById('result-popup').style.display = 'block';
 
-        // Logik für den End-Game Button im Popup
+        const nextBtn = document.getElementById('next-button-popup');
         if (currentRound >= maxRounds) {
-            document.getElementById('next-button-popup').textContent = 'Spiel beenden';
-            document.getElementById('next-button-popup').onclick = endGame;
+            nextBtn.textContent = 'Spiel beenden';
+            nextBtn.onclick = endGame;
         } else {
-            document.getElementById('next-button-popup').textContent = 'Nächste Runde starten';
-            document.getElementById('next-button-popup').onclick = startNewRound;
+            nextBtn.textContent = 'Nächste Runde starten';
+            nextBtn.onclick = startNewRound;
         }
     }
 
-    // Zeigt das Endstand-Popup an
     function endGame() {
         document.getElementById('result-popup').style.display = 'none';
-        
-        // Anzeige des Endergebnisses im Popup
         document.getElementById('endgame-score').textContent = `Dein Endergebnis: ${totalScore} Punkte`;
         document.getElementById('endgame-popup').style.display = 'block';
-
-        // Event Listener für den Neustart-Button im Popup
-        document.getElementById('restart-button-popup').onclick = startNewGame;
-        startActivityTimer(); // Aktivität
+        startActivityTimer();
     }
-    
-    // Haversine-Formel zur Berechnung der Distanz
+
     function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; 
+        const R = 6371;
         const dLat = (lat2 - lat1) * (Math.PI / 180);
         const dLon = (lon2 - lon1) * (Math.PI / 180);
-        const a = 
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; 
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
     }
 
-
-    // 7. Event Listener & Start
+    // --- EVENT LISTENER ---
     document.getElementById('confirm-guess').addEventListener('click', confirmGuess);
     document.getElementById('cancel-guess').addEventListener('click', cancelGuess);
-    document.getElementById('next-button-popup').addEventListener('click', startActivityTimer);
+    document.getElementById('restart-button-popup').addEventListener('click', startNewGame);
 
     map.on('click', handleMapClick);
 
-    // Globale Event Listener für den Inaktivitäts-Timer
-    document.addEventListener('mousemove', startActivityTimer);
-    document.addEventListener('keypress', startActivityTimer);
-    document.addEventListener('touchstart', startActivityTimer);
-    
-    // Initialisierung: Zeige nur den Splash Screen, starte das Spiel nicht
-    document.getElementById('game-container').style.display = 'none';
+    ['mousemove', 'keypress', 'touchstart', 'click'].forEach(evt => {
+        document.addEventListener(evt, startActivityTimer);
+    });
 </script>
 
 </body>
